@@ -35,7 +35,7 @@ const EmissionPage = () => {
     setNewEmissionData('');
   };
 
-  const getBadgeColor = (badge) => {
+  const getBadgeColor = (badge: string) => {
     switch (badge) {
       case 'Gold':
         return 'bg-yellow-500';

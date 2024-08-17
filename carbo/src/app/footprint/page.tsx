@@ -21,7 +21,7 @@ const FootprintPage = () => {
     setTotalFootprint(newTotal);
   }, [energyUsage, transportation, diet, consumption]);
 
-  const getFootprintColor = (value) => {
+  const getFootprintColor = (value: number) => {
     if (value < 33) return 'bg-green-500';
     if (value < 66) return 'bg-yellow-500';
     return 'bg-red-500';

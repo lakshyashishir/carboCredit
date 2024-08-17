@@ -30,7 +30,7 @@ const ModelsPage = () => {
   const handlePredict = () => {
     // Mock prediction logic
     const mockPrediction = Math.floor(Math.random() * 1000) + 500;
-    setPredictionResult(mockPrediction);
+    // setPredictionResult(mockPrediction);
     toast({
       title: "Prediction Complete",
       description: `Predicted carbon emissions: ${mockPrediction} tons`,
