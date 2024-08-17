@@ -11,6 +11,7 @@ import { chainIdToNetwork, isCorrectHederaNetwork } from '@/utils/common/helpers
 import { requestAccount, getWalletProvider, getCurrentChainId } from '@/api/wallet';
 import { HEDERA_COMMON_WALLET_REVERT_REASONS, OFFCIAL_NETWORK_NAME } from '@/utils/common/constants';
 import { NoWalletToast, CommonErrorToast, NetworkMismatchToast } from '@/components/toast/CommonToast';
+import { Leaf, TrendingUp, ShoppingBag } from 'lucide-react';
 
 const LandingPage = () => {
   const router = useRouter();
@@ -92,25 +93,25 @@ const LandingPage = () => {
       initial="hidden"
       whileInView="show"
       variants={verticalVariant}
-      className="relative text-white 2xl:max-w-[100rem] 2xl:mx-auto h-full flex-1 w-full"
+      className="relative text-white 2xl:max-w-[100rem] 2xl:mx-auto min-h-screen flex flex-col bg-gradient-to-b from-gray-900 to-gray-800"
     >
       {/* Header */}
       <motion.div variants={verticalVariant} className="flex justify-between items-center p-4">
         <h1 className="text-2xl font-bold text-hedera-green">CarboCredit</h1>
         <div>
-          <motion.div
+          <motion.button
             variants={verticalVariant}
             onClick={handleConnectWallet}
-            className="bg-gradient-to-r from-hedera-gradient-1-blue to-hedera-gradient-1-purple text-lg font-medium px-4 py-2 rounded-xl cursor-pointer mr-2 inline-block"
+            className="bg-gradient-to-r from-hedera-gradient-1-blue to-hedera-gradient-1-purple text-lg font-medium px-4 py-2 rounded-xl cursor-pointer mr-2"
           >
-            Wallet
-          </motion.div>
-          <motion.div
+            Connect Wallet
+          </motion.button>
+          <motion.button
             variants={verticalVariant}
-            className="bg-hedera-green text-white text-lg font-medium px-4 py-2 rounded-xl cursor-pointer inline-block"
+            className="bg-hedera-green text-white text-lg font-medium px-4 py-2 rounded-xl cursor-pointer"
           >
             Docs
-          </motion.div>
+          </motion.button>
         </div>
       </motion.div>
 
@@ -123,64 +124,59 @@ const LandingPage = () => {
           variants={verticalVariant}
           className="text-4xl sm:text-5xl md:text-6xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-hedera-green via-hedera-green to-hedera-green/50"
         >
-          Tokenizing Carbon
+          Tokenize Your Carbon Impact
         </motion.h1>
 
         <motion.p
           variants={verticalVariant}
           className="text-landing-text-hero font-normal text-center mt-6 sm:w-[38rem] md:w-[47rem] lg:w-[57rem]"
         >
-          CarboCredit is a platform built on the <span className="text-hedera-green font-medium">Hedera blockchain</span> that uses AI and IoT devices to measure and verify carbon emission reductions, tokenizing these reductions as tradable carbon credits.
+          CarboCredit transforms verified carbon emission reductions into tradable tokens on the <span className="text-hedera-green font-medium">Hedera blockchain</span>, powered by AI insights for maximum environmental impact.
         </motion.p>
       </motion.div>
 
-      {/* What We Offer */}
+      {/* Core Features */}
       <motion.div variants={verticalVariant} className="mt-16 w-[90%] mx-auto">
-        <h2 className="text-2xl font-semibold mb-4 text-hedera-green">What We Offer?</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {['Verified Credits', 'Blockchain Security', 'AI-Powered', 'Real-time Tracking'].map((item, index) => (
+        <h2 className="text-2xl font-semibold mb-4 text-hedera-green">Our Core Features</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            { title: 'Verified Tokenization', icon: <Leaf className="h-6 w-6 text-hedera-green" />, description: 'Turn your carbon reductions into valuable digital assets' },
+            { title: 'AI-Powered Insights', icon: <TrendingUp className="h-6 w-6 text-hedera-green" />, description: 'Get personalized strategies to reduce your carbon footprint' },
+            { title: 'Carbon Credit Marketplace', icon: <ShoppingBag className="h-6 w-6 text-hedera-green" />, description: 'Trade your carbon credits in a transparent, liquid market' }
+          ].map((item, index) => (
             <motion.div
               key={index}
               variants={verticalVariant}
-              className="bg-white/10 p-4 rounded-lg text-center"
+              className="bg-white/10 p-6 rounded-lg text-center flex flex-col items-center"
             >
-              {item}
+              {item.icon}
+              <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
+              <p className="mt-2 text-sm">{item.description}</p>
             </motion.div>
           ))}
         </div>
       </motion.div>
 
-      {/* Quick Actions */}
-      <motion.div variants={verticalVariant} className="mt-16 w-[90%] mx-auto">
-        <h2 className="text-2xl font-semibold mb-4 text-hedera-green">Quick Actions</h2>
-        <div className="flex flex-wrap justify-center gap-4">
-          <motion.div className="bg-red-500 text-white px-6 py-3 rounded-xl cursor-pointer">
-            Buy Credits
-          </motion.div>
-          <motion.div className="bg-yellow-500 text-white px-6 py-3 rounded-xl cursor-pointer">
-            Sell Credits
-          </motion.div>
-          <motion.div className="bg-blue-500 text-white px-6 py-3 rounded-xl cursor-pointer">
-            View Market
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Our Achievements */}
-      <motion.div variants={verticalVariant} className="mt-16 w-[90%] mx-auto mb-20">
-        <h2 className="text-2xl font-semibold mb-4 text-hedera-green">Our Achievements</h2>
-        <div className="bg-green-200 p-4 rounded-lg">
-          <p className="text-green-800 text-center">1,000,000 tons of CO2 reduced</p>
-        </div>
+      {/* Call to Action */}
+      <motion.div variants={verticalVariant} className="mt-16 w-[90%] mx-auto text-center">
+        <h2 className="text-2xl font-semibold mb-4 text-hedera-green">Join the Green Revolution</h2>
+        <motion.button
+          onClick={handleConnectWallet}
+          className="bg-gradient-to-r from-hedera-gradient-1-blue to-hedera-gradient-1-purple text-lg font-medium px-6 py-3 rounded-xl cursor-pointer"
+        >
+          Get Started
+        </motion.button>
       </motion.div>
 
       {/* Footer */}
-      {/* <motion.p
+      <motion.footer
         variants={verticalVariant}
-        className="fixed bottom-0 w-full text-center text-xl px-6 sm:text-2xl md:w-fit lg:text-3xl"
+        className="mt-auto py-6 text-center"
       >
-        Empowering a sustainable future through blockchain technology
-      </motion.p> */}
+        <p className="text-sm text-gray-400">
+          Empowering a sustainable future through blockchain technology and AI
+        </p>
+      </motion.footer>
     </motion.div>
   );
 };

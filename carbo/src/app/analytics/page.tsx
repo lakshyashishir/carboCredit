@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, PieChart as PieChartIcon, BarChart as BarChartIcon, Activity } from 'lucide-react';
+import NavSideBar from '@/components/sidebar';
 
 const AnalyticsPage = () => {
   const verticalVariant = VerticalCommonVariants(30, 0.5);
@@ -38,6 +39,8 @@ const AnalyticsPage = () => {
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
   return (
+    <div className="flex flex-row h-full">
+      <NavSideBar />
     <motion.div
       initial="hidden"
       whileInView="show"
@@ -188,6 +191,7 @@ const AnalyticsPage = () => {
         </p>
       </motion.footer>
     </motion.div>
+    </div>
   );
 };
 

@@ -17,7 +17,6 @@ const FootprintPage = () => {
   const [totalFootprint, setTotalFootprint] = useState(0);
 
   useEffect(() => {
-    // Calculate total footprint based on all factors
     const newTotal = (energyUsage + transportation + diet + consumption) / 2;
     setTotalFootprint(newTotal);
   }, [energyUsage, transportation, diet, consumption]);
@@ -40,7 +39,7 @@ const FootprintPage = () => {
           variants={verticalVariant}
           className="text-4xl sm:text-5xl md:text-6xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-hedera-green via-hedera-green to-hedera-green/50 mb-12"
         >
-          Carbon Footprint Simulator
+          Carbon Footprint Calculator
         </motion.h1>
 
         <motion.div variants={verticalVariant} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -49,54 +48,25 @@ const FootprintPage = () => {
               <CardTitle className="text-2xl text-hedera-green">Your Inputs</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm text-gray-300 flex items-center">
-                  <Home className="mr-2" /> Energy Usage
-                </label>
-                <Slider
-                  value={[energyUsage]}
-                  onValueChange={([value]) => setEnergyUsage(value)}
-                  max={100}
-                  step={1}
-                  className="bg-hedera-green/20"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm text-gray-300 flex items-center">
-                  <Car className="mr-2" /> Transportation
-                </label>
-                <Slider
-                  value={[transportation]}
-                  onValueChange={([value]) => setTransportation(value)}
-                  max={100}
-                  step={1}
-                  className="bg-hedera-green/20"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm text-gray-300 flex items-center">
-                  <Leaf className="mr-2" /> Diet
-                </label>
-                <Slider
-                  value={[diet]}
-                  onValueChange={([value]) => setDiet(value)}
-                  max={100}
-                  step={1}
-                  className="bg-hedera-green/20"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm text-gray-300 flex items-center">
-                  <Factory className="mr-2" /> Consumption
-                </label>
-                <Slider
-                  value={[consumption]}
-                  onValueChange={([value]) => setConsumption(value)}
-                  max={100}
-                  step={1}
-                  className="bg-hedera-green/20"
-                />
-              </div>
+              {[
+                { label: 'Energy Usage', icon: Home, state: energyUsage, setState: setEnergyUsage },
+                { label: 'Transportation', icon: Car, state: transportation, setState: setTransportation },
+                { label: 'Diet', icon: Leaf, state: diet, setState: setDiet },
+                { label: 'Consumption', icon: Factory, state: consumption, setState: setConsumption },
+              ].map((item, index) => (
+                <div key={index} className="space-y-2">
+                  <label className="text-sm text-gray-300 flex items-center">
+                    <item.icon className="mr-2" /> {item.label}
+                  </label>
+                  <Slider
+                    value={[item.state]}
+                    onValueChange={([value]) => item.setState(value)}
+                    max={100}
+                    step={1}
+                    className="bg-hedera-green/20"
+                  />
+                </div>
+              ))}
             </CardContent>
           </Card>
 
@@ -121,67 +91,7 @@ const FootprintPage = () => {
           </Card>
         </motion.div>
 
-        <motion.div variants={verticalVariant} className="mt-8">
-          <Card className="bg-white/10 backdrop-blur-md border-hedera-green/30">
-            <CardHeader>
-              <CardTitle className="text-2xl text-hedera-green">Footprint Breakdown</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <Home className="mr-2" />
-                  <span className="w-24">Energy:</span>
-                  <Progress value={energyUsage} className="flex-grow bg-hedera-green/20" />
-                  <span className="ml-2">{energyUsage}%</span>
-                </div>
-                <div className="flex items-center">
-                  <Car className="mr-2" />
-                  <span className="w-24">Transport:</span>
-                  <Progress value={transportation} className="flex-grow bg-hedera-green/20" />
-                  <span className="ml-2">{transportation}%</span>
-                </div>
-                <div className="flex items-center">
-                  <Leaf className="mr-2" />
-                  <span className="w-24">Diet:</span>
-                  <Progress value={diet} className="flex-grow bg-hedera-green/20" />
-                  <span className="ml-2">{diet}%</span>
-                </div>
-                <div className="flex items-center">
-                  <Factory className="mr-2" />
-                  <span className="w-24">Consumption:</span>
-                  <Progress value={consumption} className="flex-grow bg-hedera-green/20" />
-                  <span className="ml-2">{consumption}%</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div variants={verticalVariant} className="mt-16 w-[90%] mx-auto">
-          <h2 className="text-2xl font-semibold mb-4 text-hedera-green">Reduction Tips</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="bg-white/10 backdrop-blur-md border-hedera-green/30">
-              <CardContent className="p-4">
-                <h3 className="font-semibold mb-2">Energy Saving</h3>
-                <ul className="list-disc list-inside text-sm">
-                  <li>Switch to LED bulbs</li>
-                  <li>Improve home insulation</li>
-                  <li>Use energy-efficient appliances</li>
-                </ul>
-              </CardContent>
-            </Card>
-            <Card className="bg-white/10 backdrop-blur-md border-hedera-green/30">
-              <CardContent className="p-4">
-                <h3 className="font-semibold mb-2">Transportation</h3>
-                <ul className="list-disc list-inside text-sm">
-                  <li>Use public transportation</li>
-                  <li>Carpool or bike when possible</li>
-                  <li>Consider an electric vehicle</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-        </motion.div>
+        {/* Add more sections as needed */}
       </motion.div>
 
       <motion.footer
@@ -189,7 +99,7 @@ const FootprintPage = () => {
         className="text-center py-6 bg-gray-900 mt-20"
       >
         <p className="text-sm text-gray-400">
-          Understanding and reducing your carbon footprint for a sustainable future
+          Understanding your carbon footprint is the first step towards a sustainable future
         </p>
       </motion.footer>
     </motion.div>

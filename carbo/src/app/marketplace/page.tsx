@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ShoppingCart, TrendingUp, History, DollarSign } from 'lucide-react';
+import NavSideBar from '@/components/sidebar';
 
 const MarketplacePage = () => {
   const verticalVariant = VerticalCommonVariants(30, 0.5);
@@ -41,6 +42,9 @@ const MarketplacePage = () => {
   };
 
   return (
+    <div className="flex flex-row h-full">
+      
+      <NavSideBar />
     <motion.div
       initial="hidden"
       whileInView="show"
@@ -203,6 +207,7 @@ const MarketplacePage = () => {
         </p>
       </motion.footer>
     </motion.div>
+    </div>
   );
 };
 
