@@ -2,12 +2,13 @@ import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
-import { Home, User, FileText, ShoppingCart, BarChart2, Brain } from 'lucide-react';
+import { Home, User, FileText, ShoppingCart, BarChart2, Brain, CheckCircle } from 'lucide-react';
 
 const NAV_SIDE_BAR_ITEMS = [
   { name: 'Dashboard', path: '/dashboard', icon: Home },
   { name: 'Profile', path: '/profile', icon: User },
   { name: 'Emissions', path: '/emission', icon: FileText },
+  { name: 'Verification', path: '/verification', icon: CheckCircle },
   { name: 'Marketplace', path: '/marketplace', icon: ShoppingCart },
   { name: 'Analytics', path: '/analytics', icon: BarChart2 },
   { name: 'AI Insights', path: '/ai-insights', icon: Brain },
