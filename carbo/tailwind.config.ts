@@ -29,7 +29,7 @@ const config = {
         panel: '#374151',
         button: '#202225',
         hedera: {
-          green: '#07E78E',
+          green: '#4CBB17',
           purple: '#A98DF4',
           'gradient-1': {
             blue: '#2D84EB',
@@ -43,7 +43,7 @@ const config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
+        background: "#ffffff",
         foreground: "hsl(var(--foreground))",
         // primary: {
         //   DEFAULT: "hsl(var(--primary))",
@@ -73,6 +73,11 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        'light-green': '#e0f2f1',  // Light green color
+        'dark-green': '#004d40',   // Dark green color
+        'dark-orange': '#e65100',  // Dark orange color
+        'yellow-100': '#fff9c4',  // Light yellow color
+        'blue-100': '#bbdefb',
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useEffect, useState } from 'react';
 import { BrowserProvider } from 'ethers';
 import { useToast } from '@chakra-ui/react';
@@ -75,14 +74,14 @@ const LandingPage = () => {
   }, [accounts, router, toaster, walletProvider]);
 
   return (
-    <div className="min-h-screen flex flex-col text-white">
+    <div className="min-h-screen flex flex-col bg-white text-gray-800">
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 flex justify-between items-center p-4 z-10">
         <h1 className="text-2xl font-bold text-hedera-green">CarboCredit</h1>
         <div>
           <button
             onClick={handleConnectWallet}
-            className="bg-gradient-to-r from-hedera-gradient-1-blue to-hedera-gradient-1-purple text-lg font-medium px-4 py-2 rounded-xl cursor-pointer mr-2"
+            className="bg-gradient-to-r from-hedera-gradient-1-blue to-hedera-gradient-1-purple text-white text-lg font-medium px-4 py-2 rounded-xl cursor-pointer mr-2"
           >
             Connect Wallet
           </button>
@@ -98,15 +97,15 @@ const LandingPage = () => {
       <section className="flex items-center min-h-screen px-4 md:px-12 lg:px-24">
         <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center">
           <div className="w-full md:w-1/2 text-left mb-8 md:mb-0 md:pr-8">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-hedera-green via-hedera-green to-hedera-green/50 mb-6">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-hedera-green mb-6">
               Tokenize Your Carbon Impact
             </h1>
-            <p className="text-xl mb-8">
+            <p className="text-xl mb-8 text-gray-600">
               CarboCredit transforms verified carbon emission reductions into tradable tokens on the <span className="text-hedera-green font-medium">Hedera blockchain</span>, powered by AI insights for maximum environmental impact.
             </p>
             <button
               onClick={handleConnectWallet}
-              className="bg-gradient-to-r from-hedera-gradient-1-blue to-hedera-gradient-1-purple text-lg font-medium px-6 py-3 rounded-xl cursor-pointer"
+              className="bg-gradient-to-r from-hedera-gradient-1-blue to-hedera-gradient-1-purple text-white text-lg font-medium px-6 py-3 rounded-xl cursor-pointer"
             >
               Get Started
             </button>
@@ -122,7 +121,7 @@ const LandingPage = () => {
       </section>
 
       {/* Core Features */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-4 bg-gray-100">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-semibold mb-8 text-center text-hedera-green">Our Core Features</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -131,10 +130,10 @@ const LandingPage = () => {
               { title: 'AI-Powered Insights', icon: <TrendingUp className="h-12 w-12 text-hedera-green" />, description: 'Get personalized strategies to reduce your carbon footprint' },
               { title: 'Carbon Credit Marketplace', icon: <ShoppingBag className="h-12 w-12 text-hedera-green" />, description: 'Trade your carbon credits in a transparent, liquid market' }
             ].map((item, index) => (
-              <div key={index} className="bg-white/10 p-6 rounded-lg text-center flex flex-col items-center">
+              <div key={index} className="bg-white p-6 rounded-lg shadow-md text-center flex flex-col items-center">
                 {item.icon}
-                <h3 className="text-xl font-semibold mt-4 mb-2">{item.title}</h3>
-                <p className="text-gray-300">{item.description}</p>
+                <h3 className="text-xl font-semibold mt-4 mb-2 text-gray-800">{item.title}</h3>
+                <p className="text-gray-600">{item.description}</p>
               </div>
             ))}
           </div>
@@ -142,8 +141,8 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="mt-auto py-6 text-center bg-gray-900">
-        <p className="text-sm text-gray-400">
+      <footer className="mt-auto py-6 text-center bg-gray-200">
+        <p className="text-sm text-gray-600">
           Empowering a sustainable future through blockchain technology and AI
         </p>
       </footer>

@@ -8,6 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, AlertTriangle, FileText } from 'lucide-react';
 import NavSideBar from '@/components/sidebar';
+import Header from '@/components/header';
+
 
 interface BaseRequest {
   id: number;
@@ -24,8 +26,7 @@ interface ApprovedRequest extends BaseRequest {
   approvedDate: string;
 }
 
-const AuditorPage = () => {
-  const verticalVariant = VerticalCommonVariants(30, 0.5);
+const AuditorPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'pending' | 'approved'>('pending');
 
   const mockPendingRequests: PendingRequest[] = [
@@ -41,12 +42,12 @@ const AuditorPage = () => {
 
   const handleApprove = (id: number) => {
     console.log(`Approved request ${id}`);
-    //TODO: Implement approval logic here   
+    // TODO: Implement approval logic here
   };
 
   const handleReject = (id: number) => {
     console.log(`Rejected request ${id}`);
-    //TODO: Implement rejection logic here
+    // TODO: Implement rejection logic here
   };
 
   const renderTableRows = () => {
@@ -58,13 +59,13 @@ const AuditorPage = () => {
           <TableCell>{request.category}</TableCell>
           <TableCell>{request.date}</TableCell>
           <TableCell>
-            <Button variant="link" className="text-hedera-green p-0">
+            <Button variant="link" className="text-[#2ecc71] p-0">
               <FileText className="h-4 w-4 mr-2" />
               View Evidence
             </Button>
           </TableCell>
           <TableCell>
-            <Button onClick={() => handleApprove(request.id)} className="mr-2 bg-green-600 hover:bg-green-700">
+            <Button onClick={() => handleApprove(request.id)} className="mr-2 bg-[#2ecc71] hover:bg-[#27ae60]">
               <CheckCircle className="h-4 w-4 mr-2" />
               Approve
             </Button>
@@ -83,7 +84,7 @@ const AuditorPage = () => {
           <TableCell>{request.category}</TableCell>
           <TableCell>{request.date}</TableCell>
           <TableCell>
-            <Button variant="link" className="text-hedera-green p-0">
+            <Button variant="link" className="text-[#2ecc71] p-0">
               <FileText className="h-4 w-4 mr-2" />
               View Evidence
             </Button>
@@ -95,40 +96,33 @@ const AuditorPage = () => {
   };
 
   return (
-    <div className="flex flex-row h-full">
-      <NavSideBar />
-      <motion.div
-        initial="hidden"
-        whileInView="show"
-        variants={verticalVariant}
-        className="relative text-white 2xl:max-w-[100rem] 2xl:mx-auto h-full flex-1 w-full bg-gradient-to-b from-gray-900 to-gray-800 min-h-screen"
-      >
-        <motion.div variants={verticalVariant} className="p-8">
-          <motion.h1
-            variants={verticalVariant}
-            className="text-4xl sm:text-5xl md:text-6xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-hedera-green via-hedera-green to-hedera-green/50 mb-12"
-          >
-            Auditor Dashboard
-          </motion.h1>
-
-          <div className="flex justify-center mb-8">
+    <div className="flex h-screen bg-white">
+      <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r">
+        <NavSideBar />
+      </div>
+      <div className="flex-1 flex flex-col ml-64"> {/* Added margin-left to account for sidebar width */}
+        <Header />
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-white p-6">
+          <h1 className="text-3xl font-semibold text-[#2ecc71] mb-6">Auditor Dashboard</h1>
+          
+          <div className="flex mb-6">
             <Button
               onClick={() => setActiveTab('pending')}
-              className={`mr-4 ${activeTab === 'pending' ? 'bg-hedera-green' : 'bg-gray-600'}`}
+              className={`mr-4 ${activeTab === 'pending' ? 'bg-[#2ecc71]' : 'bg-gray-200 text-gray-800'}`}
             >
               Pending Requests
             </Button>
             <Button
               onClick={() => setActiveTab('approved')}
-              className={activeTab === 'approved' ? 'bg-hedera-green' : 'bg-gray-600'}
+              className={activeTab === 'approved' ? 'bg-[#2ecc71]' : 'bg-gray-200 text-gray-800'}
             >
               Approved Requests
             </Button>
           </div>
 
-          <Card className="bg-white/10 backdrop-blur-md border-hedera-green/30">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-hedera-green">
+              <CardTitle className="text-xl text-gray-800">
                 {activeTab === 'pending' ? 'Pending Verification Requests' : 'Approved Verification Requests'}
               </CardTitle>
             </CardHeader>
@@ -151,36 +145,31 @@ const AuditorPage = () => {
               </Table>
             </CardContent>
           </Card>
-          <motion.div variants={verticalVariant} className="mt-16 w-[90%] mx-auto">
-            <h2 className="text-2xl font-semibold mb-4 text-hedera-green">Auditor Features</h2>
+          <div className="mt-12">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">Auditor Features</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
-                { title: 'Verification Review', icon: <CheckCircle className="h-6 w-6 text-hedera-green" /> },
-                { title: 'Evidence Examination', icon: <FileText className="h-6 w-6 text-hedera-green" /> },
-                { title: 'Fraud Detection', icon: <AlertTriangle className="h-6 w-6 text-hedera-green" /> },
+                { title: 'Verification Review', icon: <CheckCircle className="h-6 w-6 text-[#2ecc71]" /> },
+                { title: 'Evidence Examination', icon: <FileText className="h-6 w-6 text-[#2ecc71]" /> },
+                { title: 'Fraud Detection', icon: <AlertTriangle className="h-6 w-6 text-[#2ecc71]" /> },
               ].map((item, index) => (
-                <motion.div
+                <div
                   key={index}
-                  variants={verticalVariant}
-                  className="bg-white/10 p-6 rounded-lg text-center flex flex-col items-center space-y-2"
+                  className="bg-[#eafaf1] p-6 rounded-lg border-2 border-[#2ecc71] text-center flex flex-col items-center space-y-2"
                 >
                   {item.icon}
-                  <span>{item.title}</span>
-                </motion.div>
+                  <span className="text-gray-800">{item.title}</span>
+                </div>
               ))}
             </div>
-          </motion.div>
-        </motion.div>
-
-        <motion.footer
-          variants={verticalVariant}
-          className="text-center py-6 bg-gray-900 mt-20"
-        >
-          <p className="text-sm text-gray-400">
+          </div>
+        </main>
+        <footer className="bg-[#eafaf1] border-t border-[#2ecc71] p-4">
+          <p className="text-center text-sm text-gray-600">
             Ensuring transparency and integrity in carbon credit verification
           </p>
-        </motion.footer>
-      </motion.div>
+        </footer>
+      </div>
     </div>
   );
 };
