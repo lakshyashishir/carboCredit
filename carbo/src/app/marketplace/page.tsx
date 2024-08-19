@@ -1,3 +1,4 @@
+
 "use client";
 
 import { motion } from 'framer-motion';
@@ -10,6 +11,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ShoppingCart, TrendingUp, History, DollarSign } from 'lucide-react';
 import NavSideBar from '@/components/sidebar';
+import Header from '@/components/header';
+import Footer from '@/components/footer';
 
 const MarketplacePage = () => {
   const verticalVariant = VerticalCommonVariants(30, 0.5);
@@ -42,171 +45,168 @@ const MarketplacePage = () => {
   };
 
   return (
-    <div className="flex flex-row h-full">
-      
-      <NavSideBar />
-    <motion.div
-      initial="hidden"
-      whileInView="show"
-      variants={verticalVariant}
-      className="relative text-white 2xl:max-w-[100rem] 2xl:mx-auto h-full flex-1 w-full bg-gradient-to-b from-gray-900 to-gray-800 min-h-screen"
-    >
-      <motion.div variants={verticalVariant} className="p-8">
-        <motion.h1
+    <div className="flex flex-col min-h-screen bg-white">
+     
+      <Header />
+
+      <div className="flex flex-row pt-16"> 
+        {/* Sidebar */}
+        <NavSideBar />
+
+        <motion.div
+          initial="hidden"
+          whileInView="show"
           variants={verticalVariant}
-          className="text-4xl sm:text-5xl md:text-6xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-hedera-green via-hedera-green to-hedera-green/50 mb-12"
+          className="flex-1 ml-72 p-8 bg-white min-h-screen"
         >
-          Carbon Credit Marketplace
-        </motion.h1>
+          <motion.h1
+            variants={verticalVariant}
+            className="text-2xl sm:text-3xl md:text-4xl font-bold text-left text-[#4CBB17] mb-8"
+          >
+            Carbon Credit Marketplace
+          </motion.h1>
 
-        <motion.div variants={verticalVariant} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <Card className="bg-white/10 backdrop-blur-md border-hedera-green/30 lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="text-2xl text-hedera-green">Market Trends</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={mockMarketData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                  <XAxis dataKey="date" stroke="#888" />
-                  <YAxis stroke="#888" />
-                  <Tooltip contentStyle={{ backgroundColor: '#333', border: 'none' }} />
-                  <Line type="monotone" dataKey="price" stroke="#82ca9d" />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          <motion.div variants={verticalVariant} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <Card className="bg-white border-[#4CBB17] border lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="text-2xl text-[#4CBB17]">Market Trends</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={mockMarketData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                    <XAxis dataKey="date" stroke="#888" />
+                    <YAxis stroke="#888" />
+                    <Tooltip contentStyle={{ backgroundColor: '#333', border: 'none' }} />
+                    <Line type="monotone" dataKey="price" stroke="#82ca9d" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
 
-          <Card className="bg-white/10 backdrop-blur-md border-hedera-green/30">
-            <CardHeader>
-              <CardTitle className="text-2xl text-hedera-green">Market Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between">
-                  <span>Current Price:</span>
-                  <span className="font-bold">$35.00</span>
+            <Card className="bg-white border-[#4CBB17] border">
+              <CardHeader>
+                <CardTitle className="text-2xl text-[#4CBB17]">Market Summary</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between">
+                    <span>Current Price:</span>
+                    <span className="font-bold">$35.00</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>24h Change:</span>
+                    <span className="text-green-400">+2.5%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Volume:</span>
+                    <span>10,000 credits</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Market Cap:</span>
+                    <span>$3,500,000</span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span>24h Change:</span>
-                  <span className="text-green-400">+2.5%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Volume:</span>
-                  <span>10,000 credits</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Market Cap:</span>
-                  <span>$3,500,000</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-        <motion.div variants={verticalVariant} className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="bg-white/10 backdrop-blur-md border-hedera-green/30">
-            <CardHeader>
-              <CardTitle className="text-2xl text-hedera-green">Buy Credits</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <Input
-                  type="number"
-                  placeholder="Amount to buy"
-                  value={buyAmount}
-                  onChange={(e) => setBuyAmount(e.target.value)}
-                  className="bg-white/5 border-hedera-green/30 text-white"
-                />
-                <Button onClick={handleBuy} className="w-full bg-green-600 hover:bg-green-700">
-                  Buy Credits
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <motion.div variants={verticalVariant} className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <Card className="bg-white border-[#4CBB17] border">
+              <CardHeader>
+                <CardTitle className="text-2xl text-[#4CBB17]">Buy Credits</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <Input
+                    type="number"
+                    placeholder="Amount to buy"
+                    value={buyAmount}
+                    onChange={(e) => setBuyAmount(e.target.value)}
+                    className="bg-white text-black border border-black" 
+                  />
+                  <Button onClick={handleBuy} className="w-full bg-green-600 hover:bg-green-700 text-white">
+                    Buy Credits
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
-          <Card className="bg-white/10 backdrop-blur-md border-hedera-green/30">
-            <CardHeader>
-              <CardTitle className="text-2xl text-hedera-green">Sell Credits</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <Input
-                  type="number"
-                  placeholder="Amount to sell"
-                  value={sellAmount}
-                  onChange={(e) => setSellAmount(e.target.value)}
-                  className="bg-white/5 border-hedera-green/30 text-white"
-                />
-                <Button onClick={handleSell} className="w-full bg-red-600 hover:bg-red-700">
-                  Sell Credits
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+            <Card className="bg-white border-[#4CBB17] border">
+              <CardHeader>
+                <CardTitle className="text-2xl text-[#4CBB17]">Sell Credits</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <Input
+                    type="number"
+                    placeholder="Amount to sell"
+                    value={sellAmount}
+                    onChange={(e) => setSellAmount(e.target.value)}
+                    className="bg-white text-black border border-black" 
+                  />
+                  <Button onClick={handleSell} className="w-full bg-red-600 hover:bg-red-700 text-white">
+                    Sell Credits
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-        <motion.div variants={verticalVariant} className="mt-8">
-          <Card className="bg-white/10 backdrop-blur-md border-hedera-green/30">
-            <CardHeader>
-              <CardTitle className="text-2xl text-hedera-green">Recent Transactions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Total</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockTransactions.map((transaction) => (
-                    <TableRow key={transaction.id}>
-                      <TableCell>{transaction.type}</TableCell>
-                      <TableCell>{transaction.amount} credits</TableCell>
-                      <TableCell>${transaction.price.toFixed(2)}</TableCell>
-                      <TableCell>${transaction.total.toFixed(2)}</TableCell>
+          <motion.div variants={verticalVariant} className="mt-8">
+            <Card className="bg-white border-[#4CBB17] border">
+              <CardHeader>
+                <CardTitle className="text-2xl text-[#4CBB17]">Recent Transactions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead>Total</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </motion.div>
+                  </TableHeader>
+                  <TableBody>
+                    {mockTransactions.map((transaction) => (
+                      <TableRow key={transaction.id}>
+                        <TableCell>{transaction.type}</TableCell>
+                        <TableCell>{transaction.amount} credits</TableCell>
+                        <TableCell>${transaction.price.toFixed(2)}</TableCell>
+                        <TableCell>${transaction.total.toFixed(2)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-        <motion.div variants={verticalVariant} className="mt-16 w-[90%] mx-auto">
-          <h2 className="text-2xl font-semibold mb-4 text-hedera-green">Marketplace Features</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { title: 'Real-time Trading', icon: <ShoppingCart className="h-6 w-6 text-hedera-green" /> },
-              { title: 'Market Trends', icon: <TrendingUp className="h-6 w-6 text-hedera-green" /> },
-              { title: 'Transaction History', icon: <History className="h-6 w-6 text-hedera-green" /> },
-              { title: 'Secure Payments', icon: <DollarSign className="h-6 w-6 text-hedera-green" /> },
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                variants={verticalVariant}
-                className="bg-white/10 p-6 rounded-lg text-center flex flex-col items-center space-y-2"
-              >
-                {item.icon}
-                <span>{item.title}</span>
-              </motion.div>
-            ))}
-          </div>
+          <motion.div variants={verticalVariant} className="mt-16 w-[90%] mx-auto">
+            <h2 className="text-2xl font-semibold mb-4 text-[#4CBB17]">Marketplace Features</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { title: 'Real-time Trading', icon: <ShoppingCart className="h-6 w-6 text-[#4CBB17]" /> },
+                { title: 'Market Trends', icon: <TrendingUp className="h-6 w-6 text-[#4CBB17]" /> },
+                { title: 'Transaction History', icon: <History className="h-6 w-6 text-[#4CBB17]" /> },
+                { title: 'Secure Payments', icon: <DollarSign className="h-6 w-6 text-[#4CBB17]" /> },
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  variants={verticalVariant}
+                  className="border border-[#4CBB17] bg-[#e9f5e9] p-6 rounded-lg text-center text-black flex flex-col items-center space-y-2"
+                >
+                  {item.icon}
+                  <span>{item.title}</span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
 
-      <motion.footer
-        variants={verticalVariant}
-        className="text-center py-6 bg-gray-900 mt-20"
-      >
-        <p className="text-sm text-gray-400">
-          Facilitating a sustainable future through transparent and efficient carbon credit trading
-        </p>
-      </motion.footer>
-    </motion.div>
+      <Footer />
     </div>
   );
 };
