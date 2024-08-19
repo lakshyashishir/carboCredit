@@ -19,7 +19,7 @@ const config = {
     },
     extend: {
       colors: { 
-        primary: '#ffffff',
+        primary: '#1A232E',
         secondary: '#303337',
         'landing-text-hero': '#8C8C8C',
         'button-stroke': {
