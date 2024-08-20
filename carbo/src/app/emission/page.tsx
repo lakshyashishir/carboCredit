@@ -64,70 +64,71 @@ const EmissionPage = () => {
     <div className="flex flex-col min-h-screen bg-white">
       <Header />
 
-      <div className="flex flex-row pt-16">
+      <div className="flex flex-row pt-4">
         {/* Sidebar */}
         <NavSideBar />
 
         <motion.div
-          initial="hidden"
-          whileInView="show"
-          variants={verticalVariant}
-          className="relative flex-1 ml-72 p-4 bg-white min-h-screen"
+  initial="hidden"
+  whileInView="show"
+  variants={verticalVariant}
+  className="relative flex-1 ml-72 p-4 bg-white"
+>
+  <motion.h1
+    variants={verticalVariant}
+    className="text-2xl sm:text-3xl md:text-4xl font-bold text-left text-[#4CBB17] mb-8 max-w-4xl mx-auto"
+  >
+    Emission Reduction Challenge
+  </motion.h1>
+
+  <motion.div
+    variants={verticalVariant}
+    className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8"
+  >
+    <Card className="bg-white border-[#4CBB17] border">
+      <CardHeader>
+        <CardTitle className="text-2xl text-[#4CBB17]">Submit New Emission Data</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-2">
+          <label className="text-sm text-gray-700">Latest Emission Reading (tons CO2)</label>
+          <Input
+            type="number"
+            placeholder="Enter your latest emission data"
+            value={newEmissionData}
+            onChange={(e) => setNewEmissionData(e.target.value)}
+            className="bg-white text-gray-700 border-0 shadow-none" 
+          />
+        </div>
+        <Button
+          onClick={handleSubmitEmission}
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white transition-colors"
         >
-          <motion.h1
-            variants={verticalVariant}
-            className="text-2xl sm:text-3xl md:text-4xl font-bold text-left text-[#4CBB17] mb-8"
-          >
-            Emission Reduction Challenge
-          </motion.h1>
+          Submit Data
+        </Button>
+      </CardContent>
+    </Card>
 
-          <motion.div
-            variants={verticalVariant}
-            className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8"
-          >
-            <Card className="bg-white border-[#4CBB17] border">
-              <CardHeader>
-                <CardTitle className="text-2xl text-[#4CBB17]">Submit New Emission Data</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-sm text-gray-700">Latest Emission Reading (tons CO2)</label>
-                  <Input
-                    type="number"
-                    placeholder="Enter your latest emission data"
-                    value={newEmissionData}
-                    onChange={(e) => setNewEmissionData(e.target.value)}
-                    className="bg-white text-gray-700 border-0 shadow-none" 
-                  />
-                </div>
-                <Button
-                  onClick={handleSubmitEmission}
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white transition-colors"
-                >
-                  Submit Data
-                </Button>
-              </CardContent>
-            </Card>
+    <Card className="bg-white border-[#4CBB17] border">
+      <CardHeader>
+        <CardTitle className="text-[#4CBB17]">Your Progress</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-700">Current Reduction</span>
+            <span className="text-lg font-bold text-[#4CBB17]">65%</span>
+          </div>
+          <CustomProgress value={65} />
+        </div>
+        <div className="text-center">
+          <Badge className={`${getBadgeColor('Silver')} text-white px-3 py-1`}>Silver Achiever</Badge>
+          <p className="mt-2 text-sm text-gray-700">Keep going to reach Gold!</p>
+        </div>
+      </CardContent>
+    </Card>
+  </motion.div>
 
-            <Card className="bg-white border-[#4CBB17] border">
-              <CardHeader>
-                <CardTitle className="text-[#4CBB17]">Your Progress</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-700">Current Reduction</span>
-                    <span className="text-lg font-bold text-[#4CBB17]">65%</span>
-                  </div>
-                  <CustomProgress value={65} />
-                </div>
-                <div className="text-center">
-                  <Badge className={`${getBadgeColor('Silver')} text-white px-3 py-1`}>Silver Achiever</Badge>
-                  <p className="mt-2 text-sm text-gray-700">Keep going to reach Gold!</p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
 
           <motion.div variants={verticalVariant} className="mt-12 max-w-4xl mx-auto">
             <Card className="bg-white border-[#4CBB17] border">

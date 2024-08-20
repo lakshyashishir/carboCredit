@@ -1,12 +1,25 @@
-
-"use client";
+'use client';
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { VerticalCommonVariants } from '@/libs/framer-motion/variants';
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
 import { TrendingUp, PieChart as PieChartIcon, BarChart as BarChartIcon, Activity } from 'lucide-react';
 import NavSideBar from '@/components/sidebar';
 import Header from '@/components/header';
@@ -43,9 +56,9 @@ const AnalyticsPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-     <Header />
+      <Header />
 
-      <div className="flex flex-row pt-16"> 
+      <div className="flex flex-row pt-4">
         {/* Sidebar */}
         <NavSideBar />
         <motion.div
@@ -54,24 +67,26 @@ const AnalyticsPage = () => {
           variants={verticalVariant}
           className="flex-1 ml-72 p-4 bg-white min-h-screen"
         >
-          <motion.h1
-            variants={verticalVariant}
-            className="text-2xl sm:text-3xl md:text-4xl font-bold text-left text-[#4CBB17] mb-8"
-          >
-            Emissions Analytics
-          </motion.h1>
+          <div className="flex flex-row justify-between">
+            <motion.h1
+              variants={verticalVariant}
+              className="text-2xl sm:text-3xl md:text-4xl font-bold text-left text-[#4CBB17] mb-2"
+            >
+              Emissions Analytics
+            </motion.h1>
 
-          <div className="mb-8 flex justify-end">
-            <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-[180px] bg-white border-[#4CBB17]/30 text-black">
-                <SelectValue placeholder="Select time range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="week">Last Week</SelectItem>
-                <SelectItem value="month">Last Month</SelectItem>
-                <SelectItem value="year">Last Year</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="mb-8 flex justify-end">
+              <Select value={timeRange} onValueChange={setTimeRange}>
+                <SelectTrigger className="w-[180px] bg-white border-[#4CBB17]/30 text-black">
+                  <SelectValue placeholder="Select time range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="week">Last Week</SelectItem>
+                  <SelectItem value="month">Last Month</SelectItem>
+                  <SelectItem value="year">Last Year</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <motion.div variants={verticalVariant} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -189,7 +204,6 @@ const AnalyticsPage = () => {
         </motion.div>
       </div>
       <Footer />
-
     </div>
   );
 };

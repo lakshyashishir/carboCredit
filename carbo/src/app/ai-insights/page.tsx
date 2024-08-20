@@ -38,7 +38,7 @@ const AIInsightsPage = () => {
     <div className="flex flex-col min-h-screen bg-white">
      <Header />
 
-      <div className="flex flex-row pt-16">
+      <div className="flex flex-row pt-4">
         <NavSideBar />
         <motion.div
           initial="hidden"

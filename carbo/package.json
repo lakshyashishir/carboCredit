@@ -1,5 +1,5 @@
 {
-  "name": "@hashgraph/system-contract-dapp-playground",
+  "name": "CarboCredit",
   "version": "0.1.0",
   "description": "Hedera System Smart Contract Dapp Playground",
   "repository": {
@@ -31,6 +31,8 @@
     "@radix-ui/react-slider": "^1.2.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
+    "@react-three/drei": "^9.111.2",
+    "@react-three/fiber": "^8.17.5",
     "@types/node": "20.4.5",
     "@types/react": "18.2.17",
     "@types/react-dom": "18.2.7",
@@ -56,6 +58,8 @@
     "tailwind-merge": "^2.5.2",
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",
+    "three": "^0.167.1",
+    "three-globe": "^2.31.1",
     "ts-node": "^10.9.1",
     "typescript": "5.1.6",
     "utf-8-validate": "^5.0.10"

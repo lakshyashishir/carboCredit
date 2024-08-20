@@ -1,10 +1,11 @@
 import { Metadata } from 'next';
 
-const DAPP_NAME = 'Hedera System Contract Dapp';
-const TITLE = 'System Contract Dapp Playground | Hedera';
-const DESCRIPTION = "Explore Hedera's system smart contract through an intutive and exciting Dapp Playground";
+const DAPP_NAME = 'CarboCredit';
+const TITLE = 'CarboCredit | Hedera';
+const DESCRIPTION = "Explore Hedera's CarboCredit through an intutive and exciting Dapp Playground";
+
 const OFFICIAL_REPO_URL =
-  'https://github.com/hashgraph/hedera-smart-contracts/system-contract-dapp-playground';
+  'https://github.com/lakshyashishir/carboCredit';
 
 const dappMetadata: Metadata = {
   // ######## DAPP ########

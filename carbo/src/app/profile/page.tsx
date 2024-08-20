@@ -26,7 +26,7 @@ const UserProfilePage = () => {
       
       <Header />
 
-      <div className="flex flex-row pt-16"> 
+      <div className="flex flex-row pt-4"> 
         {/* Sidebar */}
         <NavSideBar />
 

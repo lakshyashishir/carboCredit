@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, AlertTriangle, FileText } from 'lucide-react';
 import NavSideBar from '@/components/sidebar';
 import Header from '@/components/header';
-
+import Footer from '@/components/footer';
 
 interface BaseRequest {
   id: number;
@@ -28,6 +28,7 @@ interface ApprovedRequest extends BaseRequest {
 
 const AuditorPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'pending' | 'approved'>('pending');
+  const verticalVariant = VerticalCommonVariants(30, 0.5);
 
   const mockPendingRequests: PendingRequest[] = [
     { id: 1, user: 'Alice', amount: 100, category: 'Energy', evidence: 'link_to_evidence_1', date: '2023-08-15' },
@@ -59,17 +60,17 @@ const AuditorPage: React.FC = () => {
           <TableCell>{request.category}</TableCell>
           <TableCell>{request.date}</TableCell>
           <TableCell>
-            <Button variant="link" className="text-[#2ecc71] p-0">
+            <Button variant="link" className="text-[#4CBB17] p-0">
               <FileText className="h-4 w-4 mr-2" />
               View Evidence
             </Button>
           </TableCell>
           <TableCell>
-            <Button onClick={() => handleApprove(request.id)} className="mr-2 bg-[#2ecc71] hover:bg-[#27ae60]">
+            <Button onClick={() => handleApprove(request.id)} className="mr-2 bg-[#4CBB17] hover:bg-[#3da814] text-white">
               <CheckCircle className="h-4 w-4 mr-2" />
               Approve
             </Button>
-            <Button onClick={() => handleReject(request.id)} className="bg-red-600 hover:bg-red-700">
+            <Button onClick={() => handleReject(request.id)} className="bg-red-600 hover:bg-red-700 text-white">
               <XCircle className="h-4 w-4 mr-2" />
               Reject
             </Button>
@@ -84,7 +85,7 @@ const AuditorPage: React.FC = () => {
           <TableCell>{request.category}</TableCell>
           <TableCell>{request.date}</TableCell>
           <TableCell>
-            <Button variant="link" className="text-[#2ecc71] p-0">
+            <Button variant="link" className="text-[#4CBB17] p-0">
               <FileText className="h-4 w-4 mr-2" />
               View Evidence
             </Button>
@@ -96,33 +97,42 @@ const AuditorPage: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-white">
-      <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r">
+    <div className="flex flex-col min-h-screen bg-white">
+      <Header />
+
+      <div className="flex flex-row pt-4"> 
         <NavSideBar />
-      </div>
-      <div className="flex-1 flex flex-col ml-64"> {/* Added margin-left to account for sidebar width */}
-        <Header />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-white p-6">
-          <h1 className="text-3xl font-semibold text-[#2ecc71] mb-6">Auditor Dashboard</h1>
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          variants={verticalVariant}
+          className="flex-1 ml-64 p-8 bg-white min-h-screen"
+        >
+          <motion.h1
+            variants={verticalVariant}
+            className="text-3xl font-semibold text-[#4CBB17] mb-6"
+          >
+            Auditor Dashboard
+          </motion.h1>
           
           <div className="flex mb-6">
             <Button
               onClick={() => setActiveTab('pending')}
-              className={`mr-4 ${activeTab === 'pending' ? 'bg-[#2ecc71]' : 'bg-gray-200 text-gray-800'}`}
+              className={`mr-4 ${activeTab === 'pending' ? 'bg-[#4CBB17] text-white' : 'bg-gray-200 text-gray-800'}`}
             >
               Pending Requests
             </Button>
             <Button
               onClick={() => setActiveTab('approved')}
-              className={activeTab === 'approved' ? 'bg-[#2ecc71]' : 'bg-gray-200 text-gray-800'}
+              className={activeTab === 'approved' ? 'bg-[#4CBB17] text-white' : 'bg-gray-200 text-gray-800'}
             >
               Approved Requests
             </Button>
           </div>
 
-          <Card>
+          <Card className="bg-white border-[#4CBB17] border">
             <CardHeader>
-              <CardTitle className="text-xl text-gray-800">
+              <CardTitle className="text-xl text-[#4CBB17]">
                 {activeTab === 'pending' ? 'Pending Verification Requests' : 'Approved Verification Requests'}
               </CardTitle>
             </CardHeader>
@@ -145,31 +155,28 @@ const AuditorPage: React.FC = () => {
               </Table>
             </CardContent>
           </Card>
-          <div className="mt-12">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">Auditor Features</h2>
+          
+          <motion.div variants={verticalVariant} className="mt-12">
+            <h2 className="text-2xl font-semibold mb-4 text-[#4CBB17]">Auditor Features</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
-                { title: 'Verification Review', icon: <CheckCircle className="h-6 w-6 text-[#2ecc71]" /> },
-                { title: 'Evidence Examination', icon: <FileText className="h-6 w-6 text-[#2ecc71]" /> },
-                { title: 'Fraud Detection', icon: <AlertTriangle className="h-6 w-6 text-[#2ecc71]" /> },
+                { title: 'Verification Review', icon: <CheckCircle className="h-6 w-6 text-[#4CBB17]" /> },
+                { title: 'Evidence Examination', icon: <FileText className="h-6 w-6 text-[#4CBB17]" /> },
+                { title: 'Fraud Detection', icon: <AlertTriangle className="h-6 w-6 text-[#4CBB17]" /> },
               ].map((item, index) => (
                 <div
                   key={index}
-                  className="bg-[#eafaf1] p-6 rounded-lg border-2 border-[#2ecc71] text-center flex flex-col items-center space-y-2"
+                  className="bg-[#eafaf1] p-6 rounded-lg border-2 border-[#4CBB17] text-center flex flex-col items-center space-y-2"
                 >
                   {item.icon}
                   <span className="text-gray-800">{item.title}</span>
                 </div>
               ))}
             </div>
-          </div>
-        </main>
-        <footer className="bg-[#eafaf1] border-t border-[#2ecc71] p-4">
-          <p className="text-center text-sm text-gray-600">
-            Ensuring transparency and integrity in carbon credit verification
-          </p>
-        </footer>
+          </motion.div>
+        </motion.div>
       </div>
+      <Footer />
     </div>
   );
 };
