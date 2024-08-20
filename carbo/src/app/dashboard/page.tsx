@@ -1,6 +1,5 @@
-
 "use client";
-
+import React from 'react';
 import { motion } from 'framer-motion';
 import { VerticalCommonVariants } from '@/libs/framer-motion/variants';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -20,6 +19,13 @@ import Footer from '@/components/footer';
 
 const UserDashboard = () => {
   const verticalVariant = VerticalCommonVariants(30, 0.5);
+
+  const dashboardItems = [
+    { icon: <Leaf className="h-6 w-6 text-[#4CBB17]" />, title: 'Verified Reductions', value: '30 tons CO2' },
+    { icon: <DollarSign className="h-6 w-6 text-[#4CBB17]" />, title: 'CCT Balance', value: '150 CCT' },
+    { icon: <Award className="h-6 w-6 text-[#4CBB17]" />, title: 'Current Tier', value: 'Silver' },
+    { icon: <TrendingUp className="h-6 w-6 text-[#4CBB17]" />, title: 'Reduction Progress', value: '65% towards Gold tier' },
+  ];
 
   const emissionData = [
     { month: "Jan", emissions: 100 },
@@ -59,57 +65,25 @@ const UserDashboard = () => {
             </motion.h1>
 
             <motion.div variants={verticalVariant} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <Card className="bg-white border-gray-300 shadow-md hover:shadow-lg transition-shadow duration-300">
-                <CardHeader>
-                  <CardTitle className="text-lg text-[#4CBB17] flex items-center">
-                    <Leaf className="mr-2" /> Verified Reductions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold">30 tons CO2</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white border-gray-300 shadow-md hover:shadow-lg transition-shadow duration-300">
-                <CardHeader>
-                  <CardTitle className="text-lg text-[#4CBB17] flex items-center">
-                    <DollarSign className="mr-2" /> CCT Balance
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold">150 CCT</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white border-gray-300 shadow-md hover:shadow-lg transition-shadow duration-300">
-                <CardHeader>
-                  <CardTitle className="text-lg text-[#4CBB17] flex items-center">
-                    <Award className="mr-2" /> Current Tier
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold">Silver</p>
-                </CardContent>
-              </Card>
-
-              
-            <Card className="bg-white border-gray-300 shadow-md hover:shadow-lg transition-shadow duration-300">
-                <CardHeader>
-                  <CardTitle className="text-lg text-[#4CBB17] flex items-center">
-                    <TrendingUp className="mr-2" /> Reduction Progress
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  
-                  <div className="w-full h-4 bg-[#4CBB17]/20 rounded-full border border-[#4CBB17] overflow-hidden">
-                    <div
-                      className="h-full bg-[#4CBB17] rounded-full"
-                      style={{ width: '65%' }}
-                    ></div>
-                  </div>
-                  <p className="text-sm mt-2">65% towards Gold tier</p>
-                </CardContent>
-              </Card>
+              {dashboardItems.map((item, index) => (
+                <Card key={index} className="bg-white border border-gray-200 shadow-sm rounded-lg">
+                  <CardContent className="p-6">
+                    <div className="flex items-center mb-2">
+                      {item.icon}
+                      <h3 className="ml-2 text-sm font-medium text-gray-500">{item.title}</h3>
+                    </div>
+                    <p className="text-2xl font-semibold text-gray-700">{item.value}</p>
+                    {item.title === 'Reduction Progress' && (
+                      <div className="w-full h-2 bg-gray-200 rounded-full mt-2">
+                        <div
+                          className="h-full bg-[#4CBB17] rounded-full"
+                          style={{ width: '65%' }}
+                        ></div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
             </motion.div>
 
             <motion.div variants={verticalVariant} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -166,7 +140,7 @@ const UserDashboard = () => {
                   <motion.div
                     key={index}
                     variants={verticalVariant}
-                    className="bg-[#f0f8f0] p-4 rounded-lg text-center flex flex-col items-center space-y-2 cursor-pointer hover:bg-[#4CBB17] hover:text-white transition-colors shadow-sm"
+                    className="bg-[#f0f8f0] border border-[#4CBB17] p-4 rounded-lg text-center flex flex-col items-center space-y-2 cursor-pointer"
                   >
                     <div className="bg-white p-2 rounded-full">
                       {item.icon}
@@ -177,12 +151,9 @@ const UserDashboard = () => {
               </div>
             </motion.div>
           </motion.div>
-
         </motion.div>
-
       </div>
       <Footer/>
-
     </div>
   );
 };

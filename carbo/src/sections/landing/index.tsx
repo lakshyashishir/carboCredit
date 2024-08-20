@@ -1,97 +1,20 @@
+
 "use client";
-import React, { useEffect, useState } from 'react';
-import { BrowserProvider } from 'ethers';
-import { useToast } from '@chakra-ui/react';
-import { useRouter } from 'next/navigation';
-import { storeAccountInfoInCookies } from '@/api/cookies';
-import { chainIdToNetwork, isCorrectHederaNetwork } from '@/utils/common/helpers';
-import { requestAccount, getWalletProvider, getCurrentChainId } from '@/api/wallet';
-import { HEDERA_COMMON_WALLET_REVERT_REASONS, OFFCIAL_NETWORK_NAME } from '@/utils/common/constants';
-import { NoWalletToast, CommonErrorToast, NetworkMismatchToast } from '@/components/toast/CommonToast';
-import { Leaf, TrendingUp, ShoppingBag } from 'lucide-react';
+import React from 'react';
+import { Leaf, TrendingUp, ShoppingBag, Award, BarChart2, Layout } from 'lucide-react';
+import Header from '@/components/header';
 
 const LandingPage = () => {
-  const router = useRouter();
-  const toaster = useToast();
-  const [accounts, setAccounts] = useState<string[]>([]);
-  const { walletProvider, err: walletProviderErr } = getWalletProvider();
-
-  const handleConnectWallet = async () => {
-    if (walletProviderErr === `!${OFFCIAL_NETWORK_NAME}` || !walletProvider) {
-      NoWalletToast({ toaster });
-      return;
-    }
-
-    if (!(await isCorrectHederaNetwork(walletProvider))) {
-      NetworkMismatchToast({ toaster });
-      return;
-    }
-
-    const { accounts, err: getAccountErr } = await requestAccount(walletProvider!);
-
-    if (getAccountErr || !accounts || accounts.length === 0) {
-      let errorMessage = 'Unknown error appeared...';
-      if (JSON.stringify(getAccountErr).indexOf(HEDERA_COMMON_WALLET_REVERT_REASONS.REJECT.code) !== -1) {
-        errorMessage = HEDERA_COMMON_WALLET_REVERT_REASONS.REJECT.description;
-      } else if (
-        JSON.stringify(getAccountErr).indexOf(HEDERA_COMMON_WALLET_REVERT_REASONS.NETWORK_SWITCH.code) !== -1
-      ) {
-        errorMessage = HEDERA_COMMON_WALLET_REVERT_REASONS.NETWORK_SWITCH.description;
-      }
-
-      CommonErrorToast({
-        toaster,
-        title: 'Cannot connect account',
-        description: errorMessage,
-      });
-      return;
-    }
-
-    setAccounts(accounts as string[]);
+  // Placeholder function for handleConnectWallet
+  const handleConnectWallet = () => {
+    console.log("Connect wallet functionality to be implemented");
+    // Implement actual wallet connection logic here
   };
-
-  useEffect(() => {
-    (async () => {
-      if (accounts.length > 0) {
-        const currentChainId = (await getCurrentChainId(walletProvider as BrowserProvider))
-          .currentChainId as string;
-
-        const network = chainIdToNetwork(currentChainId);
-
-        const err = storeAccountInfoInCookies(accounts, network);
-        if (err) {
-          CommonErrorToast({
-            toaster,
-            title: 'Error logging in',
-            description: HEDERA_COMMON_WALLET_REVERT_REASONS.DEFAULT.description,
-          });
-          return;
-        }
-
-        router.push('/hedera/overview');
-      }
-    })();
-  }, [accounts, router, toaster, walletProvider]);
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-800">
-      {/* Header */}
-      <header className="absolute top-0 left-0 right-0 flex justify-between items-center p-4 z-10">
-        <h1 className="text-2xl font-bold text-hedera-green">CarboCredit</h1>
-        <div>
-          <button
-            onClick={handleConnectWallet}
-            className="bg-gradient-to-r from-hedera-gradient-1-blue to-hedera-gradient-1-purple text-white text-lg font-medium px-4 py-2 rounded-xl cursor-pointer mr-2"
-          >
-            Connect Wallet
-          </button>
-          <button
-            className="bg-hedera-green text-white text-lg font-medium px-4 py-2 rounded-xl cursor-pointer"
-          >
-            Docs
-          </button>
-        </div>
-      </header>
+    
+      <Header />
 
       {/* Hero */}
       <section className="flex items-center min-h-screen px-4 md:px-12 lg:px-24">
@@ -105,7 +28,7 @@ const LandingPage = () => {
             </p>
             <button
               onClick={handleConnectWallet}
-              className="bg-gradient-to-r from-hedera-gradient-1-blue to-hedera-gradient-1-purple text-white text-lg font-medium px-6 py-3 rounded-xl cursor-pointer"
+              className="bg-blue-500 text-white text-lg font-medium px-6 py-3 rounded-xl cursor-pointer"
             >
               Get Started
             </button>
@@ -121,16 +44,19 @@ const LandingPage = () => {
       </section>
 
       {/* Core Features */}
-      <section className="py-16 px-4 bg-gray-100">
+      <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-semibold mb-8 text-center text-hedera-green">Our Core Features</h2>
+          <h2 className="text-3xl font-bold mb-8 text-left text-hedera-green">Our Core Features</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { title: 'Verified Tokenization', icon: <Leaf className="h-12 w-12 text-hedera-green" />, description: 'Turn your carbon reductions into valuable digital assets' },
               { title: 'AI-Powered Insights', icon: <TrendingUp className="h-12 w-12 text-hedera-green" />, description: 'Get personalized strategies to reduce your carbon footprint' },
-              { title: 'Carbon Credit Marketplace', icon: <ShoppingBag className="h-12 w-12 text-hedera-green" />, description: 'Trade your carbon credits in a transparent, liquid market' }
+              { title: 'Carbon Credit Marketplace', icon: <ShoppingBag className="h-12 w-12 text-hedera-green" />, description: 'Trade your carbon credits in a transparent, liquid market' },
+              { title: 'Emission Reduction Challenge', icon: <Award className="h-12 w-12 text-hedera-green" />, description: 'Participate in challenges to boost your reduction efforts' },
+              { title: 'Advanced Analytics', icon: <BarChart2 className="h-12 w-12 text-hedera-green" />, description: 'Gain deep insights into your emission patterns and reduction impact' },
+              { title: 'User-Friendly Dashboard', icon: <Layout className="h-12 w-12 text-hedera-green" />, description: 'Monitor and manage your carbon credits with ease' }
             ].map((item, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-md text-center flex flex-col items-center">
+              <div key={index} className="bg-green-50 border border-green-200 p-6 rounded-lg shadow-sm text-center flex flex-col items-center transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg hover:bg-green-100">
                 {item.icon}
                 <h3 className="text-xl font-semibold mt-4 mb-2 text-gray-800">{item.title}</h3>
                 <p className="text-gray-600">{item.description}</p>
@@ -141,7 +67,7 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="mt-auto py-6 text-center bg-gray-200">
+      <footer className="mt-auto py-6 text-center bg-green-50">
         <p className="text-sm text-gray-600">
           Empowering a sustainable future through blockchain technology and AI
         </p>
