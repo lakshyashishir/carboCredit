@@ -5,7 +5,6 @@ export const getEmissionPredictions = async (req: Request, res: Response) => {
     try {
         const userId = req.user.id;
 
-        // Fetch the user's last 30 emissions
         const { data: emissions, error } = await supabase
             .from('emissions')
             .select('amount, date')
@@ -19,13 +18,10 @@ export const getEmissionPredictions = async (req: Request, res: Response) => {
             return res.status(200).json({ prediction: 0, message: "Not enough data for prediction" });
         }
 
-        // Calculate average emission
         const averageEmission = emissions.reduce((sum, emission) => sum + emission.amount, 0) / emissions.length;
 
-        // Simple prediction: Assume a 5% reduction from average
         const prediction = averageEmission * 0.95;
 
-        // Generate next 7 days of predictions
         const today = new Date();
         const predictions = Array.from({ length: 7 }, (_, i) => ({
             date: new Date(today.getTime() + i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -42,7 +38,6 @@ export const getEmissionRecommendations = async (req: Request, res: Response) =>
     try {
         const userId = req.user.id;
 
-        // Fetch the user's last emission
         const { data: lastEmission, error } = await supabase
             .from('emissions')
             .select('amount, category')
@@ -53,7 +48,6 @@ export const getEmissionRecommendations = async (req: Request, res: Response) =>
 
         if (error) throw error;
 
-        // Simple recommendation system based on the last emission category
         let recommendations;
         switch (lastEmission.category) {
             case 'transport':
@@ -95,7 +89,6 @@ export const getEmissionAnomalies = async (req: Request, res: Response) => {
     try {
         const userId = req.user.id;
 
-        // Fetch the user's last 30 emissions
         const { data: emissions, error } = await supabase
             .from('emissions')
             .select('amount, date, category')
@@ -109,12 +102,10 @@ export const getEmissionAnomalies = async (req: Request, res: Response) => {
             return res.status(200).json({ anomalies: [], message: "Not enough data for anomaly detection" });
         }
 
-        // Calculate mean and standard deviation
         const amounts = emissions.map(e => e.amount);
         const mean = amounts.reduce((sum, amount) => sum + amount, 0) / amounts.length;
         const stdDev = Math.sqrt(amounts.reduce((sq, amount) => sq + Math.pow(amount - mean, 2), 0) / amounts.length);
 
-        // Define anomaly as any emission more than 2 standard deviations from the mean
         const anomalies = emissions.filter(emission => 
             Math.abs(emission.amount - mean) > 2 * stdDev
         ).map(anomaly => ({

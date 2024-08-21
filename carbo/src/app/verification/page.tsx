@@ -1,8 +1,17 @@
 "use client";
 
+import React, { useState, useEffect } from 'react';
+import {
+  Client,
+  AccountId,
+  PrivateKey,
+  ContractExecuteTransaction,
+  ContractFunctionParameters,
+  ContractId,
+  ContractCallQuery,
+  Hbar
+} from "@hashgraph/sdk";
 import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { useToast } from '@chakra-ui/react';
 import { VerticalCommonVariants } from '@/libs/framer-motion/variants';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -14,33 +23,98 @@ import NavSideBar from '@/components/sidebar';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 
-const VerificationPage = () => {
-  const toast = useToast();
+const EMISSION_VERIFICATION_CONTRACT_ID = "0.0.4709640";
+
+interface VerificationRequest {
+  id: number;
+  amount: number;
+  category: string;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  date: string;
+}
+
+const VerificationPage: React.FC = () => {
   const verticalVariant = VerticalCommonVariants(30, 0.5);
+  const [client, setClient] = useState<Client | null>(null);
+  const [accountId, setAccountId] = useState<string>('');
   const [verificationData, setVerificationData] = useState({
     amount: '',
     category: '',
     evidence: '',
   });
+  const [verifications, setVerifications] = useState<VerificationRequest[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const mockVerifications = [
-    { id: 1, amount: 100, category: 'Reforestation', status: 'Pending', date: '2023-06-01' },
-    { id: 2, amount: 75, category: 'Solar Energy', status: 'Approved', date: '2023-05-15' },
-    { id: 3, amount: 50, category: 'Waste Reduction', status: 'Rejected', date: '2023-05-01' },
-  ];
+  useEffect(() => {
+    initializeHederaClient();
+  }, []);
 
-  const handleSubmitVerification = () => {
-    toast({
-      title: 'Verification Request Submitted',
-      description: 'Your carbon reduction verification request has been submitted successfully.',
-      status: 'success',
-      duration: 5000,
-      isClosable: true,
-    });
-    setVerificationData({ amount: '', category: '', evidence: '' });
+  const initializeHederaClient = async () => {
+    const myAccountId = AccountId.fromString(process.env.NEXT_PUBLIC_MY_ACCOUNT_ID!);
+    const myPrivateKey = PrivateKey.fromString(process.env.NEXT_PUBLIC_MY_PRIVATE_KEY!);
+
+    if (myAccountId == null || myPrivateKey == null) {
+      throw new Error("Environment variables MY_ACCOUNT_ID and MY_PRIVATE_KEY must be present");
+    }
+
+    const client = Client.forTestnet();
+    client.setOperator(myAccountId, myPrivateKey);
+
+    setClient(client);
+    setAccountId(myAccountId.toString());
+
+    await fetchVerifications(client);
   };
 
-  const getStatusColor = (status: string) => {
+  const fetchVerifications = async (clientInstance: Client) => {
+    try {
+      const mockVerifications: VerificationRequest[] = [
+        { id: 1, amount: 100, category: 'Reforestation', status: 'Pending', date: '2023-06-01' },
+        { id: 2, amount: 75, category: 'Solar Energy', status: 'Approved', date: '2023-05-15' },
+        { id: 3, amount: 50, category: 'Waste Reduction', status: 'Rejected', date: '2023-05-01' },
+      ];
+      setVerifications(mockVerifications);
+    } catch (error) {
+      console.error('Error fetching verifications:', error);
+      setError('Failed to load verifications. Using mock data.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmitVerification = async () => {
+    if (!client) {
+      alert('Hedera client not initialized');
+      return;
+    }
+
+    try {
+      const contractExecuteTx = new ContractExecuteTransaction()
+        .setContractId(ContractId.fromString(EMISSION_VERIFICATION_CONTRACT_ID))
+        .setGas(100000)
+        .setFunction(
+          "reportEmission",
+          new ContractFunctionParameters().addUint256(parseInt(verificationData.amount))
+        );
+
+      const submitTx = await contractExecuteTx.execute(client);
+      const receipt = await submitTx.getReceipt(client);
+
+      if (receipt.status.toString() === "SUCCESS") {
+        alert('Verification Request Submitted Successfully');
+        setVerificationData({ amount: '', category: '', evidence: '' });
+        fetchVerifications(client);
+      } else {
+        throw new Error('Transaction failed');
+      }
+    } catch (error) {
+      console.error('Error submitting verification request:', error);
+      alert('Failed to submit verification request. Please try again.');
+    }
+  };
+
+  const getStatusColor = (status: string): string => {
     switch (status) {
       case 'Approved':
         return 'bg-[#4CBB17] text-white';
@@ -50,6 +124,14 @@ const VerificationPage = () => {
         return 'bg-yellow-500 text-white';
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    console.warn(error);
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -69,6 +151,10 @@ const VerificationPage = () => {
             >
             Carbon Reduction Verification
           </motion.h1>
+
+          {accountId && (
+            <p className="mb-4">Connected Account: {accountId}</p>
+          )}
 
           <motion.div variants={verticalVariant} className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card className="bg-white border-[#4CBB17] border">
@@ -115,17 +201,6 @@ const VerificationPage = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-white border-[#4CBB17] border">
-              <CardHeader>
-                <CardTitle className="text-2xl text-[#4CBB17]">Verification Process</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-gray-700">1. Submit your carbon reduction claim with evidence.</p>
-                <p className="text-sm text-gray-700">2. Our auditors will review your submission.</p>
-                <p className="text-sm text-gray-700">3. If approved, carbon credits will be minted to your account.</p>
-                <p className="text-sm text-gray-700">4. Track your verification status in real-time.</p>
-              </CardContent>
-            </Card>
           </motion.div>
 
           <motion.div variants={verticalVariant} className="mt-12">
@@ -144,7 +219,7 @@ const VerificationPage = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockVerifications.map((verification) => (
+                    {verifications.map((verification) => (
                       <TableRow key={verification.id}>
                         <TableCell>{verification.amount}</TableCell>
                         <TableCell>{verification.category}</TableCell>

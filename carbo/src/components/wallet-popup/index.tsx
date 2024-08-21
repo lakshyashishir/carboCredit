@@ -19,9 +19,10 @@ interface PageProps {
   network: TNetworkName;
   userAddress: string;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  onDisconnect: () => void;
 }
 
-const WalletPopup = ({ setIsOpen, userAddress, network }: PageProps) => {
+const WalletPopup = ({ setIsOpen, userAddress, network, onDisconnect }: PageProps) => {
   const toaster = useToast();
   const [isCopied, setIsCopied] = useState({
     accountId: false,
@@ -38,7 +39,6 @@ const WalletPopup = ({ setIsOpen, userAddress, network }: PageProps) => {
    * @dev loading user Hedera native accountId
    */
   useEffect(() => {
-    // handle walletObject or walletProvider being null by toasting it out on the client
     if (walletProviderErr === '!HEDERA' || !walletProvider) {
       NoWalletToast({ toaster });
       return;
@@ -57,10 +57,8 @@ const WalletPopup = ({ setIsOpen, userAddress, network }: PageProps) => {
         return;
       }
 
-      // handle updating balance state
       setAccountBalance(`${Number(ethers.formatEther(balance)).toFixed(4)} ℏ`);
 
-      // handle getting Hedera native accountId from EvmAddress
       const { accountId, err: getAccountIdErr } = await getHederaNativeIDFromEvmAddress(
         userAddress,
         network,
@@ -76,7 +74,6 @@ const WalletPopup = ({ setIsOpen, userAddress, network }: PageProps) => {
         return;
       }
 
-      // handle updating accoundId state
       setHederaAccountId(accountId);
     })();
   }, [userAddress, network, toaster, walletProvider, walletProviderErr]);
@@ -101,23 +98,18 @@ const WalletPopup = ({ setIsOpen, userAddress, network }: PageProps) => {
    * @dev disconnect user
    */
   const handleDisconnect = async () => {
-    // close modal
     onClose();
 
-    // clear Cookies cache
     await clearCookies();
 
-    // clear localStorage cache
     clearCachedTransactions();
 
-    // redirect user to landing page
     setIsOpen(false);
     window.location.reload();
   };
 
   return (
     <div className="w-screen h-screen inset-0 fixed flex justify-center items-center z-50">
-      {/* Overlay */}
       <div
         onClick={() => setIsOpen(false)}
         className="w-screen h-screen inset-0 fixed bg-white/10 dark:bg-black/10 backdrop-blur-lg"
@@ -127,10 +119,8 @@ const WalletPopup = ({ setIsOpen, userAddress, network }: PageProps) => {
                     bg-secondary text-white font-styrene w-[30rem]"
       >
         <div className=" flex flex-col items-center py-3 gap-4 mx-6">
-          {/* Hedera network */}
           <p className="text-2xl">Hedera</p>
 
-          {/* network dropdown */}
           <div className="flex bg-button text-white w-full border-[1px] border-white/50 hover:bg-transparent justify-center rounded-xl cursor-pointer">
             <div className="flex justify-center text-lg items-center gap-1 py-2">
               {network}
@@ -138,18 +128,14 @@ const WalletPopup = ({ setIsOpen, userAddress, network }: PageProps) => {
             </div>
           </div>
 
-          {/* Account information */}
           <div className="w-full flex flex-col gap-3">
-            {/* AccountID */}
             <div className="flex justify-between">
-              {/* title */}
               <div className="flex gap-1 items-center relative">
                 <p>Account ID:</p>
                 <div className="cursor-pointer">
                   <BsFillQuestionOctagonFill />
                 </div>
               </div>
-              {/* value */}
               <div
                 onClick={() => {
                   copyWalletAddress('ACCOUNTID');
@@ -171,16 +157,13 @@ const WalletPopup = ({ setIsOpen, userAddress, network }: PageProps) => {
               </div>
             </div>
 
-            {/* EVM address */}
             <div className="flex justify-between">
-              {/* title */}
               <div className="flex gap-1 items-center">
                 <p>EVM Address:</p>
                 <div className="cursor-pointer">
                   <BsFillQuestionOctagonFill />
                 </div>
               </div>
-              {/* value */}
               <div
                 onClick={() => {
                   copyWalletAddress('EVMADDR');
@@ -202,19 +185,14 @@ const WalletPopup = ({ setIsOpen, userAddress, network }: PageProps) => {
               </div>
             </div>
 
-            {/* Balance */}
             <div className="flex justify-between items-center">
-              {/* title */}
               <p>Balance:</p>
-              {/* value */}
               <div>{accountBalance || <SkeletonText mt="4" w="20" noOfLines={1} skeletonHeight="2" />}</div>
             </div>
           </div>
 
-          {/* Buttons */}
           <div className="w-full flex flex-col gap-3 pb-3">
             <div className="flex w-full gap-2">
-              {/* Explore */}
               <Link
                 href={`${HASHSCAN_BASE_URL}/${network}/address/${userAddress}`}
                 target="_blank"
@@ -226,18 +204,17 @@ const WalletPopup = ({ setIsOpen, userAddress, network }: PageProps) => {
                 </p>
               </Link>
 
-              {/* Activity */}
-              <Link
-                href={'/activity'}
-                className="flex flex-col items-center py-1 bg-button text-white w-full border-[1px] border-white/50 hover:bg-transparent justify-center rounded-xl cursor-pointer"
+              <button
+                onClick={() => {
+                  onDisconnect();
+                  setIsOpen(false);
+                }}
               >
-                <Image src={'/assets/icons/list-icon.png'} alt={''} width={15} height={15} />
-                <p className="flex justify-center text-sm items-center gap-1 py-2 leading-[.5rem]">
-                  Activity
-                </p>
-              </Link>
+                Disconnect
+              </button>
+              <button onClick={() => setIsOpen(false)}>Close</button>
 
-              {/* Disconnect */}
+             
             </div>
             <button
               onClick={() => {

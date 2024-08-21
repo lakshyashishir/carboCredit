@@ -80,7 +80,6 @@ const LandingPage = () => {
     <div className="min-h-screen flex flex-col bg-white text-gray-800">
       <Header />
 
-      {/* Hero */}
       <section className="bg-white flex items-center min-h-screen justify-center px-4 md:px-12 lg:px-24">
         <div className="flex flex-col items-center justify-center h-screen w-screen p-0 overflow-hidden relative">
           <div className="max-w-7xl mx-auto w-full relative overflow-hidden h-full px-4 py-8">
@@ -109,7 +108,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Core Features */}
       <section className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold mb-8 text-left text-hedera-green">Our Core Features</h2>
@@ -159,7 +157,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="mt-auto py-6 text-center bg-green-50">
         <p className="text-sm text-gray-600">
           Empowering a sustainable future through blockchain technology and AI

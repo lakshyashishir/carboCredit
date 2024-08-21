@@ -1,7 +1,15 @@
 "use client";
 
+import React, { useState, useEffect } from 'react';
+import { 
+  Client, 
+  ContractExecuteTransaction, 
+  ContractFunctionParameters,
+  AccountId,
+  PrivateKey,
+  ContractId
+} from "@hashgraph/sdk";
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 import { VerticalCommonVariants } from '@/libs/framer-motion/variants';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -11,89 +19,109 @@ import NavSideBar from '@/components/sidebar';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 
-interface BaseRequest {
+const EMISSION_VERIFICATION_CONTRACT_ID = "0.0.4709640";
+
+interface VerificationRequest {
   id: number;
-  user: string;
-  amount: number;
-  category: string;
-  evidence: string;
+  company: string;
+  emissionAmountTons: number;
+  status: 'Pending' | 'Approved' | 'Rejected';
   date: string;
-}
-
-interface PendingRequest extends BaseRequest {}
-
-interface ApprovedRequest extends BaseRequest {
-  approvedDate: string;
 }
 
 const AuditorPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'pending' | 'approved'>('pending');
   const verticalVariant = VerticalCommonVariants(30, 0.5);
+  const [client, setClient] = useState<Client | null>(null);
+  const [accountId, setAccountId] = useState<string>('');
+  const [verificationRequests, setVerificationRequests] = useState<VerificationRequest[]>([]);
 
-  const mockPendingRequests: PendingRequest[] = [
-    { id: 1, user: 'Alice', amount: 100, category: 'Energy', evidence: 'link_to_evidence_1', date: '2023-08-15' },
-    { id: 2, user: 'Bob', amount: 75, category: 'Transport', evidence: 'link_to_evidence_2', date: '2023-08-16' },
-    { id: 3, user: 'Charlie', amount: 150, category: 'Industry', evidence: 'link_to_evidence_3', date: '2023-08-17' },
-  ];
+  useEffect(() => {
+    initializeHederaClient();
+  }, []);
 
-  const mockApprovedRequests: ApprovedRequest[] = [
-    { id: 4, user: 'David', amount: 120, category: 'Energy', evidence: 'link_to_evidence_4', date: '2023-08-14', approvedDate: '2023-08-15' },
-    { id: 5, user: 'Eve', amount: 90, category: 'Transport', evidence: 'link_to_evidence_5', date: '2023-08-13', approvedDate: '2023-08-14' },
-  ];
+  const initializeHederaClient = async () => {
+    const myAccountId = AccountId.fromString(process.env.NEXT_PUBLIC_MY_ACCOUNT_ID!);
+    const myPrivateKey = PrivateKey.fromString(process.env.NEXT_PUBLIC_MY_PRIVATE_KEY!);
 
-  const handleApprove = (id: number) => {
-    console.log(`Approved request ${id}`);
-    // TODO: Implement approval logic here
+    if (myAccountId == null || myPrivateKey == null) {
+      throw new Error("Environment variables MY_ACCOUNT_ID and MY_PRIVATE_KEY must be present");
+    }
+
+    const client = Client.forTestnet();
+    client.setOperator(myAccountId, myPrivateKey);
+
+    setClient(client);
+    setAccountId(myAccountId.toString());
   };
 
-  const handleReject = (id: number) => {
-    console.log(`Rejected request ${id}`);
-    // TODO: Implement rejection logic here
+  const fetchVerificationRequests = async () => {
+    const mockRequests: VerificationRequest[] = [
+      { id: 1, company: '0.0.1111', emissionAmountTons: 100, status: 'Pending', date: '2023-08-15' },
+      { id: 2, company: '0.0.2222', emissionAmountTons: 75, status: 'Pending', date: '2023-08-16' },
+      { id: 3, company: '0.0.3333', emissionAmountTons: 150, status: 'Approved', date: '2023-08-14' },
+    ];
+    setVerificationRequests(mockRequests);
+  };
+
+  useEffect(() => {
+    if (client) {
+      fetchVerificationRequests();
+    }
+  }, [client]);
+
+  const handleVerify = async (id: number, verified: boolean) => {
+    if (!client) {
+      alert('Hedera client not initialized');
+      return;
+    }
+
+    try {
+      const contractExecuteTx = new ContractExecuteTransaction()
+        .setContractId(ContractId.fromString(EMISSION_VERIFICATION_CONTRACT_ID))
+        .setGas(100000)
+        .setFunction("verifyEmission", new ContractFunctionParameters()
+          .addUint256(id)
+          .addBool(verified));
+
+      const submitTx = await contractExecuteTx.execute(client);
+      const receipt = await submitTx.getReceipt(client);
+
+      if (receipt.status.toString() === "SUCCESS") {
+        alert(`Verification ${verified ? 'approved' : 'rejected'} successfully!`);
+        fetchVerificationRequests();
+      } else {
+        alert('Transaction failed');
+      }
+    } catch (error) {
+      console.error('Error verifying emission:', error);
+      alert('Failed to verify emission. See console for details.');
+    }
   };
 
   const renderTableRows = () => {
-    if (activeTab === 'pending') {
-      return mockPendingRequests.map((request) => (
+    return verificationRequests
+      .filter(request => activeTab === 'pending' ? request.status === 'Pending' : request.status === 'Approved')
+      .map((request) => (
         <TableRow key={request.id}>
-          <TableCell>{request.user}</TableCell>
-          <TableCell>{request.amount} tons</TableCell>
-          <TableCell>{request.category}</TableCell>
+          <TableCell>{request.company}</TableCell>
+          <TableCell>{request.emissionAmountTons} tons</TableCell>
           <TableCell>{request.date}</TableCell>
-          <TableCell>
-            <Button variant="link" className="text-[#4CBB17] p-0">
-              <FileText className="h-4 w-4 mr-2" />
-              View Evidence
-            </Button>
-          </TableCell>
-          <TableCell>
-            <Button onClick={() => handleApprove(request.id)} className="mr-2 bg-[#4CBB17] hover:bg-[#3da814] text-white">
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Approve
-            </Button>
-            <Button onClick={() => handleReject(request.id)} className="bg-red-600 hover:bg-red-700 text-white">
-              <XCircle className="h-4 w-4 mr-2" />
-              Reject
-            </Button>
-          </TableCell>
+          <TableCell>{request.status}</TableCell>
+          {activeTab === 'pending' && (
+            <TableCell>
+              <Button onClick={() => handleVerify(request.id, true)} className="mr-2 bg-[#4CBB17] hover:bg-[#3da814] text-white">
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Approve
+              </Button>
+              <Button onClick={() => handleVerify(request.id, false)} className="bg-red-600 hover:bg-red-700 text-white">
+                <XCircle className="h-4 w-4 mr-2" />
+                Reject
+              </Button>
+            </TableCell>
+          )}
         </TableRow>
       ));
-    } else {
-      return mockApprovedRequests.map((request) => (
-        <TableRow key={request.id}>
-          <TableCell>{request.user}</TableCell>
-          <TableCell>{request.amount} tons</TableCell>
-          <TableCell>{request.category}</TableCell>
-          <TableCell>{request.date}</TableCell>
-          <TableCell>
-            <Button variant="link" className="text-[#4CBB17] p-0">
-              <FileText className="h-4 w-4 mr-2" />
-              View Evidence
-            </Button>
-          </TableCell>
-          <TableCell>{request.approvedDate}</TableCell>
-        </TableRow>
-      ));
-    }
   };
 
   return (
@@ -115,46 +143,54 @@ const AuditorPage: React.FC = () => {
             Auditor Dashboard
           </motion.h1>
           
-          <div className="flex mb-6">
-            <Button
-              onClick={() => setActiveTab('pending')}
-              className={`mr-4 ${activeTab === 'pending' ? 'bg-[#4CBB17] text-white' : 'bg-gray-200 text-gray-800'}`}
-            >
-              Pending Requests
-            </Button>
-            <Button
-              onClick={() => setActiveTab('approved')}
-              className={activeTab === 'approved' ? 'bg-[#4CBB17] text-white' : 'bg-gray-200 text-gray-800'}
-            >
-              Approved Requests
-            </Button>
-          </div>
+          {!accountId && (
+            <p>Initializing Hedera client...</p>
+          )}
 
-          <Card className="bg-white border-[#4CBB17] border">
-            <CardHeader>
-              <CardTitle className="text-xl text-[#4CBB17]">
-                {activeTab === 'pending' ? 'Pending Verification Requests' : 'Approved Verification Requests'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Evidence</TableHead>
-                    {activeTab === 'approved' && <TableHead>Approved Date</TableHead>}
-                    {activeTab === 'pending' && <TableHead>Actions</TableHead>}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {renderTableRows()}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          {accountId && (
+            <>
+              <p className="mb-4">Connected Account: {accountId}</p>
+              <div className="flex mb-6">
+                <Button
+                  onClick={() => setActiveTab('pending')}
+                  className={`mr-4 ${activeTab === 'pending' ? 'bg-[#4CBB17] text-white' : 'bg-gray-200 text-gray-800'}`}
+                >
+                  Pending Requests
+                </Button>
+                <Button
+                  onClick={() => setActiveTab('approved')}
+                  className={activeTab === 'approved' ? 'bg-[#4CBB17] text-white' : 'bg-gray-200 text-gray-800'}
+                >
+                  Approved Requests
+                </Button>
+              </div>
+
+              <Card className="bg-white border-[#4CBB17] border">
+                <CardHeader>
+                  <CardTitle className="text-xl text-[#4CBB17]">
+                    {activeTab === 'pending' ? 'Pending Verification Requests' : 'Approved Verification Requests'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Company</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Status</TableHead>
+                        {activeTab === 'pending' && <TableHead>Actions</TableHead>}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {renderTableRows()}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </>
+          )}
+          
           
           <motion.div variants={verticalVariant} className="mt-12">
             <h2 className="text-2xl font-semibold mb-4 text-[#4CBB17]">Auditor Features</h2>

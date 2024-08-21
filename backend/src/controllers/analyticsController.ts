@@ -13,7 +13,6 @@ export const getEmissionAnalytics = async (req: Request, res: Response) => {
 
         if (error) throw error;
 
-        // Simple analytics: total emissions per category
         const analytics = data.reduce((acc, emission) => {
             acc[emission.category] = (acc[emission.category] || 0) + emission.amount;
             return acc;
@@ -37,7 +36,6 @@ export const getCreditAnalytics = async (req: Request, res: Response) => {
 
         if (error) throw error;
 
-        // Simple analytics: total credits per transaction type
         const analytics = data.reduce((acc, credit) => {
             acc[credit.transactionType] = (acc[credit.transactionType] || 0) + credit.amount;
             return acc;
@@ -58,7 +56,6 @@ export const getMarketAnalytics = async (req: Request, res: Response) => {
 
         if (error) throw error;
 
-        // Simple analytics: average price and total volume
         const analytics = data.reduce((acc, listing) => {
             acc.totalVolume += listing.amount;
             acc.totalValue += listing.price * listing.amount;

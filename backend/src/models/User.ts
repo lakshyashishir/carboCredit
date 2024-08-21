@@ -3,8 +3,8 @@ import { Credit } from "./Credit";
 import { MarketplaceListing } from "./MarketplaceListing";
 
 export interface User {
-    id: string;  // This will be the Hedera account ID
-    walletAddress: string;  // The public key of the user's wallet
+    id: string;  
+    walletAddress: string; 
     username: string; 
     profilePicture?: string;
     carbonCredits: number;

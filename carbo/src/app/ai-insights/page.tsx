@@ -1,5 +1,6 @@
-"use client"
+"use client";
 
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { VerticalCommonVariants } from '@/libs/framer-motion/variants';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -11,17 +12,66 @@ import NavSideBar from '@/components/sidebar';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 
-const AIInsightsPage = () => {
-  const verticalVariant = VerticalCommonVariants(30, 0.5);
+interface EmissionForecast {
+  month: string;
+  actual: number;
+  predicted: number;
+}
 
-  const emissionData = [
-    { month: 'Jan', actual: 100, predicted: 98 },
-    { month: 'Feb', actual: 95, predicted: 93 },
-    { month: 'Mar', actual: 88, predicted: 89 },
-    { month: 'Apr', actual: 82, predicted: 85 },
-    { month: 'May', actual: 75, predicted: 81 },
-    { month: 'Jun', actual: 70, predicted: 77 },
-  ];
+interface AIInsightsData {
+  emissionForecast: EmissionForecast[];
+  recommendations: string[];
+  anomalies: string[];
+}
+
+const AIInsightsPage: React.FC = () => {
+  const verticalVariant = VerticalCommonVariants(30, 0.5);
+  const [insightsData, setInsightsData] = useState<AIInsightsData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchAIInsights();
+  }, []);
+
+  const fetchAIInsights = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/ai/insights', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch AI insights');
+      const data: AIInsightsData = await response.json();
+      setInsightsData(data);
+    } catch (error) {
+      console.error('Error fetching AI insights:', error);
+      setError('Failed to load AI insights. Using mock data.');
+      setInsightsData(getMockAIInsights());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getMockAIInsights = (): AIInsightsData => ({
+    emissionForecast: [
+      { month: 'Jan', actual: 100, predicted: 98 },
+      { month: 'Feb', actual: 95, predicted: 93 },
+      { month: 'Mar', actual: 88, predicted: 89 },
+      { month: 'Apr', actual: 82, predicted: 85 },
+      { month: 'May', actual: 75, predicted: 81 },
+      { month: 'Jun', actual: 70, predicted: 77 },
+    ],
+    recommendations: [
+      "Switch to LED bulbs to reduce energy consumption",
+      "Consider carpooling to decrease transportation emissions",
+      "Reduce meat consumption for lower dietary carbon footprint",
+    ],
+    anomalies: [
+      "No significant anomalies detected in your recent emission patterns.",
+    ],
+  });
+
 
   const chartConfig = {
     actual: {
@@ -62,7 +112,7 @@ const AIInsightsPage = () => {
               </CardHeader>
               <CardContent>
                 <ChartContainer config={chartConfig} className="h-[400px]">
-                  <LineChart data={emissionData}>
+                  <LineChart data={insightsData ? insightsData.emissionForecast : []}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" stroke="#888888" />
                     <YAxis stroke="#888888" />

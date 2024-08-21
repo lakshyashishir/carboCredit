@@ -1,21 +1,181 @@
 
 "use client";
 
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import React, { useState, useEffect } from 'react';
+import {
+  Client,
+  AccountId,
+  PrivateKey,
+  ContractExecuteTransaction,
+  ContractFunctionParameters,
+  ContractId,
+  Hbar
+} from "@hashgraph/sdk";
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 import { VerticalCommonVariants } from '@/libs/framer-motion/variants';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ShoppingCart, TrendingUp, History, DollarSign } from 'lucide-react';
 import NavSideBar from '@/components/sidebar';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 
-const MarketplacePage = () => {
+const MARKETPLACE_CONTRACT_ID = "0.0.1234567";
+const TOKEN_CONTRACT_ID = "0.0.7654321";
+
+interface Listing {
+  tokenId: string;
+  seller: string;
+  price: string;
+}
+
+const MarketplacePage: React.FC = () => {
   const verticalVariant = VerticalCommonVariants(30, 0.5);
+  const [client, setClient] = useState<Client | null>(null);
+  const [accountId, setAccountId] = useState<string>('');
+  const [tokenId, setTokenId] = useState<string>('');
+  const [price, setPrice] = useState<string>('');
+  const [listings, setListings] = useState<Listing[]>([]);
+
+  useEffect(() => {
+    initializeHederaClient();
+  }, []);
+
+  const initializeHederaClient = async () => {
+    const myAccountId = AccountId.fromString(process.env.NEXT_PUBLIC_MY_ACCOUNT_ID!);
+    const myPrivateKey = PrivateKey.fromString(process.env.NEXT_PUBLIC_MY_PRIVATE_KEY!);
+
+    if (myAccountId == null || myPrivateKey == null) {
+      throw new Error("Environment variables MY_ACCOUNT_ID and MY_PRIVATE_KEY must be present");
+    }
+
+    const client = Client.forTestnet();
+    client.setOperator(myAccountId, myPrivateKey);
+
+    setClient(client);
+    setAccountId(myAccountId.toString());
+  };
+
+  const listCredit = async () => {
+    if (!client) {
+      alert('Hedera client not initialized');
+      return;
+    }
+
+    try {
+      // First, approve the marketplace contract to transfer the token
+      const approveTx = new ContractExecuteTransaction()
+        .setContractId(ContractId.fromString(TOKEN_CONTRACT_ID))
+        .setGas(100000)
+        .setFunction("approve", new ContractFunctionParameters()
+          .addAddress(MARKETPLACE_CONTRACT_ID)
+          .addUint256(parseInt(tokenId)));
+
+      const approveSubmit = await approveTx.execute(client);
+      const approveReceipt = await approveSubmit.getReceipt(client);
+
+      if (approveReceipt.status.toString() !== "SUCCESS") {
+        throw new Error("Failed to approve token transfer");
+      }
+
+      // Now, list the credit
+      const listTx = new ContractExecuteTransaction()
+        .setContractId(ContractId.fromString(MARKETPLACE_CONTRACT_ID))
+        .setGas(100000)
+        .setFunction("listCredit", new ContractFunctionParameters()
+          .addUint256(parseInt(tokenId))
+          .addUint256(Hbar.from(parseFloat(price), Hbar.Unit.Hbar).toTinybars().toNumber()));
+
+      const listSubmit = await listTx.execute(client);
+      const listReceipt = await listSubmit.getReceipt(client);
+
+      if (listReceipt.status.toString() === "SUCCESS") {
+        alert('Credit listed successfully!');
+        fetchListings();
+      } else {
+        alert('Failed to list credit');
+      }
+    } catch (error) {
+      console.error('Error listing credit:', error);
+      alert('Failed to list credit. See console for details.');
+    }
+  };
+
+  const buyCredit = async (tokenId: string, price: string) => {
+    if (!client) {
+      alert('Hedera client not initialized');
+      return;
+    }
+
+    try {
+      const buyTx = new ContractExecuteTransaction()
+        .setContractId(ContractId.fromString(MARKETPLACE_CONTRACT_ID))
+        .setGas(100000)
+        .setPayableAmount(Hbar.from(parseFloat(price), Hbar.Unit.Hbar))
+        .setFunction("buyCredit", new ContractFunctionParameters()
+          .addUint256(parseInt(tokenId)));
+
+      const buySubmit = await buyTx.execute(client);
+      const buyReceipt = await buySubmit.getReceipt(client);
+
+      if (buyReceipt.status.toString() === "SUCCESS") {
+        alert('Credit purchased successfully!');
+        fetchListings();
+      } else {
+        alert('Failed to purchase credit');
+      }
+    } catch (error) {
+      console.error('Error buying credit:', error);
+      alert('Failed to buy credit. See console for details.');
+    }
+  };
+
+  const cancelListing = async (tokenId: string) => {
+    if (!client) {
+      alert('Hedera client not initialized');
+      return;
+    }
+
+    try {
+      const cancelTx = new ContractExecuteTransaction()
+        .setContractId(ContractId.fromString(MARKETPLACE_CONTRACT_ID))
+        .setGas(100000)
+        .setFunction("cancelListing", new ContractFunctionParameters()
+          .addUint256(parseInt(tokenId)));
+
+      const cancelSubmit = await cancelTx.execute(client);
+      const cancelReceipt = await cancelSubmit.getReceipt(client);
+
+      if (cancelReceipt.status.toString() === "SUCCESS") {
+        alert('Listing cancelled successfully!');
+        fetchListings();
+      } else {
+        alert('Failed to cancel listing');
+      }
+    } catch (error) {
+      console.error('Error cancelling listing:', error);
+      alert('Failed to cancel listing. See console for details.');
+    }
+  };
+
+  const fetchListings = async () => {
+    // In a real application, you would call a contract function or backend API to get this data
+    // For this example, we'll use mock data
+    const mockListings: Listing[] = [
+      { tokenId: '1', seller: '0.0.1111', price: '1.5' },
+      { tokenId: '2', seller: '0.0.2222', price: '2.0' },
+    ];
+    setListings(mockListings);
+  };
+
+  useEffect(() => {
+    if (client) {
+      fetchListings();
+    }
+  }, [client]);
   const [buyAmount, setBuyAmount] = useState('');
   const [sellAmount, setSellAmount] = useState('');
 
@@ -36,12 +196,10 @@ const MarketplacePage = () => {
 
   const handleBuy = () => {
     console.log('Buying credits:', buyAmount);
-    // Implement buy logic here
   };
 
   const handleSell = () => {
     console.log('Selling credits:', sellAmount);
-    // Implement sell logic here
   };
 
   return (
@@ -111,7 +269,75 @@ const MarketplacePage = () => {
             </Card>
           </motion.div>
 
-          <motion.div variants={verticalVariant} className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {!accountId && (
+            <p>Initializing Hedera client...</p>
+          )}
+
+          {accountId && (
+            <>
+              <p className="mb-4">Connected Account: {accountId}</p>
+
+              <Card className="bg-white border-[#4CBB17] border mb-8">
+                <CardHeader>
+                  <CardTitle className="text-2xl text-[#4CBB17]">List Carbon Credit</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Input
+                    type="number"
+                    placeholder="Token ID"
+                    value={tokenId}
+                    onChange={(e) => setTokenId(e.target.value)}
+                    className="bg-white text-black border border-black" 
+                  />
+                  <Input
+                    type="number"
+                    placeholder="Price in HBAR"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    className="bg-white text-black border border-black" 
+                  />
+                  <Button onClick={listCredit} className="w-full bg-green-600 hover:bg-green-700 text-white">
+                    List Credit
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white border-[#4CBB17] border">
+                <CardHeader>
+                  <CardTitle className="text-2xl text-[#4CBB17]">Available Listings</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Token ID</TableHead>
+                        <TableHead>Seller</TableHead>
+                        <TableHead>Price (HBAR)</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {listings.map((listing) => (
+                        <TableRow key={listing.tokenId}>
+                          <TableCell>{listing.tokenId}</TableCell>
+                          <TableCell>{listing.seller}</TableCell>
+                          <TableCell>{listing.price}</TableCell>
+                          <TableCell>
+                            <Button onClick={() => buyCredit(listing.tokenId, listing.price)} className="mr-2">Buy</Button>
+                            {listing.seller === accountId && (
+                              <Button onClick={() => cancelListing(listing.tokenId)}>Cancel</Button>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </>
+          )}
+
+          {/* <motion.div variants={verticalVariant} className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Card className="bg-white border-[#4CBB17] border">
               <CardHeader>
                 <CardTitle className="text-2xl text-[#4CBB17]">Buy Credits</CardTitle>
@@ -151,7 +377,7 @@ const MarketplacePage = () => {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </motion.div> */}
 
           <motion.div variants={verticalVariant} className="mt-8">
             <Card className="bg-white border-[#4CBB17] border">

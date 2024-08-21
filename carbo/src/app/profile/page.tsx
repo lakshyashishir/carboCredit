@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { VerticalCommonVariants } from '@/libs/framer-motion/variants';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -8,8 +9,20 @@ import { User, Award, Leaf, TrendingUp } from 'lucide-react';
 import NavSideBar from '@/components/sidebar';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-const CustomProgress = ({ value, className }) => (
+interface UserProfile {
+  username: string;
+  email: string;
+  joinedDate: string;
+  tier: string;
+  carbonReduction: number;
+  creditsEarned: number;
+  consecutiveReductions: number;
+}
+
+const CustomProgress: React.FC<{ value: number; className?: string }> = ({ value, className }) => (
   <div className={`w-full h-2 bg-gray-200 rounded-full border border-gray-300 overflow-hidden ${className}`}>
     <div
       className="h-full bg-blue-500 rounded-full"
@@ -18,16 +31,92 @@ const CustomProgress = ({ value, className }) => (
   </div>
 );
 
-const UserProfilePage = () => {
+const ProfilePage: React.FC = () => {
   const verticalVariant = VerticalCommonVariants(30, 0.5);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [editing, setEditing] = useState<boolean>(false);
+  const [editedUsername, setEditedUsername] = useState<string>('');
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/users/profile', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch profile data');
+      }
+      const data: UserProfile = await response.json();
+      setProfile(data);
+      setEditedUsername(data.username);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      setError('Failed to load profile data. Using mock data.');
+      setProfile(getMockProfile());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getMockProfile = (): UserProfile => ({
+    username: 'John Doe',
+    email: 'john@example.com',
+    joinedDate: '2023-01-01',
+    tier: 'Silver',
+    carbonReduction: 75,
+    creditsEarned: 150,
+    consecutiveReductions: 5,
+  });
+
+  const handleEdit = () => {
+    setEditing(true);
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ username: editedUsername }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+      setProfile(prev => prev ? { ...prev, username: editedUsername } : null);
+      setEditing(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setError('Failed to update profile. Please try again.');
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    console.warn(error);
+  }
+
+  if (!profile) {
+    return <div>Error loading profile data</div>;
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      
       <Header />
 
       <div className="flex flex-row pt-4"> 
-        {/* Sidebar */}
         <NavSideBar />
 
         <motion.div
@@ -53,10 +142,22 @@ const UserProfilePage = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <p><span className="font-bold">Name:</span> John Doe</p>
-                    <p><span className="font-bold">Email:</span> john@example.com</p>
-                    <p><span className="font-bold">Joined:</span> January 1, 2023</p>
-                    <Badge className="bg-[#4CBB17] text-white">Silver Tier</Badge>
+                    {editing ? (
+                      <div>
+                        <label className="font-bold">Username:</label>
+                        <Input
+                          value={editedUsername}
+                          onChange={(e) => setEditedUsername(e.target.value)}
+                          className="mt-1"
+                        />
+                        <Button onClick={handleSave} className="mt-2 bg-[#4CBB17] text-white">Save</Button>
+                      </div>
+                    ) : (
+                      <p><span className="font-bold">Name:</span> {profile.username} <Button onClick={handleEdit} className="ml-2 bg-[#4CBB17] text-white">Edit</Button></p>
+                    )}
+                    <p><span className="font-bold">Email:</span> {profile.email}</p>
+                    <p><span className="font-bold">Joined:</span> {new Date(profile.joinedDate).toLocaleDateString()}</p>
+                    <Badge className="bg-[#4CBB17] text-white">{profile.tier} Tier</Badge>
                   </div>
                 </CardContent>
               </Card>
@@ -72,27 +173,25 @@ const UserProfilePage = () => {
                     <div>
                       <div className="flex justify-between mb-2">
                         <span>Carbon Reduction Progress</span>
-                        <span>75%</span>
+                        <span>{profile.carbonReduction}%</span>
                       </div>
-                      
-                      <CustomProgress value={75} />
+                      <CustomProgress value={profile.carbonReduction} />
                     </div>
                     <div>
                       <div className="flex justify-between mb-2">
                         <span>Credits Earned</span>
-                        <span>150 CCT</span>
+                        <span>{profile.creditsEarned} CCT</span>
                       </div>
-                    
-                      <CustomProgress value={60} />
+                      <CustomProgress value={(profile.creditsEarned / 250) * 100} />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="flex items-center">
                         <Leaf className="mr-2 text-[#4CBB17]" />
-                        <span>30 tons CO2 reduced</span>
+                        <span>{profile.carbonReduction} tons CO2 reduced</span>
                       </div>
                       <div className="flex items-center">
                         <TrendingUp className="mr-2 text-[#4CBB17]" />
-                        <span>5 consecutive months of reduction</span>
+                        <span>{profile.consecutiveReductions} consecutive months of reduction</span>
                       </div>
                     </div>
                   </div>
@@ -107,4 +206,4 @@ const UserProfilePage = () => {
   );
 };
 
-export default UserProfilePage;
+export default ProfilePage;

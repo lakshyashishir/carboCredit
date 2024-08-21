@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 import { VerticalCommonVariants } from '@/libs/framer-motion/variants';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
@@ -25,41 +25,108 @@ import NavSideBar from '@/components/sidebar';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 
-const AnalyticsPage = () => {
+interface EmissionTrend {
+  name: string;
+  actual: number;
+  predicted: number;
+}
+
+interface EmissionSource {
+  name: string;
+  value: number;
+}
+
+interface GasComposition {
+  name: string;
+  value: number;
+}
+
+interface AnalyticsData {
+  emissionTrend: EmissionTrend[];
+  emissionSources: EmissionSource[];
+  gasComposition: GasComposition[];
+  reductionFromLastYear: number;
+  totalCreditsEarned: number;
+  projectedMonthlyReduction: number;
+  currentTier: string;
+}
+
+const AnalyticsPage: React.FC = () => {
   const verticalVariant = VerticalCommonVariants(30, 0.5);
-  const [timeRange, setTimeRange] = useState('month');
+  const [timeRange, setTimeRange] = useState<string>('month');
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const lineChartData = [
-    { name: 'Jan', actual: 4000, predicted: 4200 },
-    { name: 'Feb', actual: 3000, predicted: 3100 },
-    { name: 'Mar', actual: 2000, predicted: 2050 },
-    { name: 'Apr', actual: 2780, predicted: 2800 },
-    { name: 'May', actual: 1890, predicted: 1950 },
-    { name: 'Jun', actual: 2390, predicted: 2450 },
-  ];
+  useEffect(() => {
+    fetchAnalyticsData();
+  }, [timeRange]);
 
-  const barChartData = [
-    { name: 'Transport', value: 400 },
-    { name: 'Energy', value: 300 },
-    { name: 'Industry', value: 300 },
-    { name: 'Agriculture', value: 200 },
-  ];
+  const fetchAnalyticsData = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/analytics?timeRange=${timeRange}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch analytics data');
+      const data: AnalyticsData = await response.json();
+      setAnalyticsData(data);
+    } catch (error) {
+      console.error('Error fetching analytics data:', error);
+      setError('Failed to load analytics data. Using mock data.');
+      setAnalyticsData(getMockAnalyticsData());
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const pieChartData = [
-    { name: 'CO2', value: 400 },
-    { name: 'CH4', value: 300 },
-    { name: 'N2O', value: 300 },
-    { name: 'F-gases', value: 200 },
-  ];
+  const getMockAnalyticsData = (): AnalyticsData => ({
+    emissionTrend: [
+      { name: 'Jan', actual: 4000, predicted: 4200 },
+      { name: 'Feb', actual: 3000, predicted: 3100 },
+      { name: 'Mar', actual: 2000, predicted: 2050 },
+      { name: 'Apr', actual: 2780, predicted: 2800 },
+      { name: 'May', actual: 1890, predicted: 1950 },
+      { name: 'Jun', actual: 2390, predicted: 2450 },
+    ],
+    emissionSources: [
+      { name: 'Transport', value: 400 },
+      { name: 'Energy', value: 300 },
+      { name: 'Industry', value: 300 },
+      { name: 'Agriculture', value: 200 },
+    ],
+    gasComposition: [
+      { name: 'CO2', value: 400 },
+      { name: 'CH4', value: 300 },
+      { name: 'N2O', value: 300 },
+      { name: 'F-gases', value: 200 },
+    ],
+    reductionFromLastYear: 25,
+    totalCreditsEarned: 10000,
+    projectedMonthlyReduction: 50,
+    currentTier: 'Gold',
+  });
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    console.warn(error);
+  }
+
+  if (!analyticsData) {
+    return <div>Error loading analytics data</div>;
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <Header />
 
       <div className="flex flex-row pt-4">
-        {/* Sidebar */}
         <NavSideBar />
         <motion.div
           initial="hidden"
@@ -96,7 +163,7 @@ const AnalyticsPage = () => {
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={lineChartData}>
+                  <LineChart data={analyticsData.emissionTrend}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#444" />
                     <XAxis dataKey="name" stroke="#888" />
                     <YAxis stroke="#888" />
@@ -115,7 +182,7 @@ const AnalyticsPage = () => {
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={barChartData}>
+                  <BarChart data={analyticsData.emissionSources}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#444" />
                     <XAxis dataKey="name" stroke="#888" />
                     <YAxis stroke="#888" />
@@ -135,7 +202,7 @@ const AnalyticsPage = () => {
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
-                      data={pieChartData}
+                      data={analyticsData.gasComposition}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
@@ -143,7 +210,7 @@ const AnalyticsPage = () => {
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {pieChartData.map((entry, index) => (
+                      {analyticsData.gasComposition.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
@@ -161,19 +228,19 @@ const AnalyticsPage = () => {
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-[#4CBB17]">25%</p>
+                    <p className="text-3xl font-bold text-[#4CBB17]">{analyticsData.reductionFromLastYear}%</p>
                     <p className="text-sm text-gray-500">Reduction from Last Year</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-[#4CBB17]">10,000</p>
+                    <p className="text-3xl font-bold text-[#4CBB17]">{analyticsData.totalCreditsEarned}</p>
                     <p className="text-sm text-gray-500">Total Credits Earned</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-[#4CBB17]">50 tons</p>
+                    <p className="text-3xl font-bold text-[#4CBB17]">{analyticsData.projectedMonthlyReduction} tons</p>
                     <p className="text-sm text-gray-500">Projected Monthly Reduction</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-[#4CBB17]">Gold</p>
+                    <p className="text-3xl font-bold text-[#4CBB17]">{analyticsData.currentTier}</p>
                     <p className="text-sm text-gray-500">Current Tier</p>
                   </div>
                 </div>

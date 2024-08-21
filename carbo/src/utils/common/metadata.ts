@@ -11,13 +11,9 @@ const dappMetadata: Metadata = {
   // ######## DAPP ########
   applicationName: DAPP_NAME,
   keywords: [
-    'Hedera System Contract Dapp',
-    'Hashgraph System Contract Dapp',
-    'Hedera',
-    'Hashgraph',
-    'Swirlds Labs',
-    'Dapp Playground',
-    'Hedera System Smart Contracts',
+    'CarboCredit',
+
+    
   ],
   title: TITLE,
   description: DESCRIPTION,

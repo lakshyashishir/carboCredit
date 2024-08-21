@@ -1,35 +1,62 @@
-import { Client, TopicCreateTransaction, TopicMessageSubmitTransaction } from "@hashgraph/sdk";
-import { client } from '../config/database';
+const { Client, ContractExecuteTransaction, ContractCallQuery, Hbar } = require("@hashgraph/sdk");
+require('dotenv').config();
 
-export const createTopic = async () => {
-  const transaction = new TopicCreateTransaction();
-  const txResponse = await transaction.execute(client);
-  const receipt = await txResponse.getReceipt(client);
-  const topicId = receipt.topicId;
-  console.log(`Topic created with ID: ${topicId}`);
-  return topicId;
+const accountId = process.env.MY_ACCOUNT_ID;
+const privateKey = process.env.MY_PRIVATE_KEY;
+
+const client = Client.forTestnet();
+client.setOperator(accountId, privateKey);
+
+const carbonCreditTokenAddress = "0xbef98e94bfe0b7de322ccc1545975dd342a4fbdd";
+const carbonCreditMarketplaceAddress = "0x32b5a14674a4935b9b0e6357081e976f146403a3";
+const emissionVerificationAddress = "0x7fb4f9808008495647cb2f57540ab36d5fe282cc";
+const userRewardsAddress = "0x6afd921bf175a6d66ecc552382f52ba6e702067f";
+
+const hederaService = {
+  async mintCredit(recipient, amount, projectId) {
+    const transaction = new ContractExecuteTransaction()
+      .setContractId(carbonCreditTokenAddress)
+      .setGas(100000)
+      .setFunction("mintCredit", [recipient, amount, projectId]);
+
+    const txResponse = await transaction.execute(client);
+    const receipt = await txResponse.getReceipt(client);
+    return receipt;
+  },
+
+  async listCredit(tokenId, price) {
+    const transaction = new ContractExecuteTransaction()
+      .setContractId(carbonCreditMarketplaceAddress)
+      .setGas(100000)
+      .setFunction("listCredit", [tokenId, price]);
+
+    const txResponse = await transaction.execute(client);
+    const receipt = await txResponse.getReceipt(client);
+    return receipt;
+  },
+
+  async reportEmission(emissionAmount) {
+    const transaction = new ContractExecuteTransaction()
+      .setContractId(emissionVerificationAddress)
+      .setGas(100000)
+      .setFunction("reportEmission", [emissionAmount]);
+
+    const txResponse = await transaction.execute(client);
+    const receipt = await txResponse.getReceipt(client);
+    return receipt;
+  },
+
+  async claimReward() {
+    const transaction = new ContractExecuteTransaction()
+      .setContractId(userRewardsAddress)
+      .setGas(100000)
+      .setFunction("claimReward", []);
+
+    const txResponse = await transaction.execute(client);
+    const receipt = await txResponse.getReceipt(client);
+    return receipt;
+  },
+
 };
 
-export const storeEmissionOnHCS = async (userId: string, amount: number, category: string, date: string) => {
-  const message = JSON.stringify({ userId, amount, category, date });
-  const transaction = new TopicMessageSubmitTransaction()
-    .setTopicId(process.env.HEDERA_TOPIC_ID)
-    .setMessage(message);
-
-  const txResponse = await transaction.execute(client);
-  const receipt = await txResponse.getReceipt(client);
-  const consensusTimestamp = receipt.consensusTimestamp;
-
-  console.log(`Message sent with consensus timestamp: ${consensusTimestamp}`);
-  return consensusTimestamp;
-};
-
-export const mintCarbonCredit = async (userId: string, amount: number) => {
-  //TODO: Implement logic to mint a carbon credit token using Hedera Token Service
-  console.log(`Minting ${amount} carbon credits for user ${userId}`);
-};
-
-export const transferCarbonCredit = async (fromUserId: string, toUserId: string, amount: number) => {
-  //TODO: Implement logic to transfer carbon credit tokens between users
-  console.log(`Transferring ${amount} carbon credits from user ${fromUserId} to user ${toUserId}`);
-};
+module.exports = hederaService;

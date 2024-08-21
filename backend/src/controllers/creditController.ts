@@ -7,7 +7,7 @@ export const mintCarbonCredits = async (req: Request, res: Response) => {
         const { amount } = req.body;
         const userId = req.user.id;
 
-        // TODO:  interact with Hedera here to mint the credits
+        // TODO: interact with Hedera here to mint the credits
 
         const { data, error } = await supabase
             .from('credits')
@@ -16,7 +16,6 @@ export const mintCarbonCredits = async (req: Request, res: Response) => {
 
         if (error) throw error;
 
-        // Update user's credit balance
         await supabase
             .from('users')
             .update({ carbonCredits: req.user.carbonCredits + amount })

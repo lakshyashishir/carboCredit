@@ -15,7 +15,9 @@ export const login = async (req: Request, res: Response) => {
             const newUser = {
                 walletAddress,
                 username: `User-${walletAddress.slice(0, 6)}`,
-                carbonCredits: 0
+                carbonCredits: 0,
+                emissionsReduced: 0,
+                projectsParticipated: 0, 
             };
 
             const { data, error: insertError } = await supabase
@@ -31,6 +33,7 @@ export const login = async (req: Request, res: Response) => {
 
         res.status(200).json({ user });
     } catch (error) {
+        console.error('Authentication error:', error);
         res.status(400).json({ error: 'Authentication failed' });
     }
 };
