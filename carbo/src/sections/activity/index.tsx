@@ -8,10 +8,10 @@ import { HEDERA_BRANDING_COLORS } from '@/utils/common/constants';
 import { Select, useToast, useDisclosure } from '@chakra-ui/react';
 import { usePaginatedTxResults } from '@/hooks/usePaginatedTxResults';
 import ConfirmModal from '@/components/common/components/ConfirmModal';
-import QueryResponseModal from '@/components/activity/QueryResponseModal';
+// import QueryResponseModal from '@/components/activity/QueryResponseModal';
 import { ITransactionResult } from '@/types/contract-interactions/shared';
-import ExtraOptionsButton from '@/components/activity/ExtraOptionsButton';
-import ActivityTransactionTable from '@/components/activity/ActivityTransactionTable';
+// import ExtraOptionsButton from '@/components/activity/ExtraOptionsButton';
+// import ActivityTransactionTable from '@/components/activity/ActivityTransactionTable';
 import { clearCachedTransactions, getArrayTypedValuesFromLocalStorage } from '@/api/localStorage';
 import { prepareCSVData, prepareCSVHeaders, prepareTransactionList } from '@/utils/common/helpers';
 
@@ -179,32 +179,19 @@ const ActivitySection = () => {
             </Select>
           </div>
 
-          {/* Extra options button */}
+          {/* Extra options button
           <ExtraOptionsButton
             onOpen={onOpen}
             CSVData={CSVData}
             CSVHeaders={CSVHeaders}
             setIsRemoveModalOpen={setIsRemoveModalOpen}
             selectedTransactionList={selectedTransactionList}
-          />
+          /> */}
         </div>
       )}
 
       {sortedTransactionList.length > 0 ? (
-        <ActivityTransactionTable
-          onOpen={onOpen}
-          allChecked={allChecked}
-          isIndeterminate={isIndeterminate}
-          transactionList={transactionList}
-          setQueryReponseObj={setQueryReponseObj}
-          setTransactionList={setTransactionList}
-          parsedHederaNetwork={parsedHederaNetwork}
-          TRANSACTION_PAGE_SIZE={TRANSACTION_PAGE_SIZE}
-          currentTransactionPage={currentTransactionPage}
-          setCurrentTransactionPage={setCurrentTransactionPage}
-          setSelectedTransactionList={setSelectedTransactionList}
-          paginatedTransactionResults={paginatedTransactionResults}
-        />
+        <></>
       ) : (
         <div className="h-full flex justify-center items-center font-styrene text-xl font-light italic text-white/70">
           <p>No transactions have been made.</p>
@@ -212,12 +199,7 @@ const ActivitySection = () => {
       )}
 
       {queryResponseObj.isOpen && (
-        <QueryResponseModal
-          isOpen={isOpen}
-          onClose={onClose}
-          hederaNetwork={parsedHederaNetwork}
-          transaction={queryResponseObj.selectedTransaction}
-        />
+        <></>
       )}
 
       {isRemoveModalOpen && (

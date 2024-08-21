@@ -86,8 +86,7 @@ const MarketplacePage: React.FC = () => {
         .setContractId(ContractId.fromString(MARKETPLACE_CONTRACT_ID))
         .setGas(100000)
         .setFunction("listCredit", new ContractFunctionParameters()
-          .addUint256(parseInt(tokenId))
-          .addUint256(Hbar.from(parseFloat(price), Hbar.Unit.Hbar).toTinybars().toNumber()));
+          .addUint256(parseInt(tokenId)));
 
       const listSubmit = await listTx.execute(client);
       const listReceipt = await listSubmit.getReceipt(client);
@@ -114,7 +113,6 @@ const MarketplacePage: React.FC = () => {
       const buyTx = new ContractExecuteTransaction()
         .setContractId(ContractId.fromString(MARKETPLACE_CONTRACT_ID))
         .setGas(100000)
-        .setPayableAmount(Hbar.from(parseFloat(price), Hbar.Unit.Hbar))
         .setFunction("buyCredit", new ContractFunctionParameters()
           .addUint256(parseInt(tokenId)));
 
