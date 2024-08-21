@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserProvider } from 'ethers';
 import { useToast } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { storeAccountInfoInCookies } from '@/api/cookies';
 import { chainIdToNetwork, isCorrectHederaNetwork } from '@/utils/common/helpers';
 import { requestAccount, getWalletProvider, getCurrentChainId } from '@/api/wallet';
@@ -10,7 +11,9 @@ import { HEDERA_COMMON_WALLET_REVERT_REASONS, OFFCIAL_NETWORK_NAME } from '@/uti
 import { NoWalletToast, CommonErrorToast, NetworkMismatchToast } from '@/components/toast/CommonToast';
 import { Leaf, TrendingUp, ShoppingBag, Award, BarChart2, Layout } from 'lucide-react';
 import Header from '@/components/header';
-import { World, globeConfig } from '@/components/ui/globe';
+const World = dynamic(() => import("@/components/ui/globe").then((m) => m.World), {
+  ssr: false,
+});
 import { motion } from 'framer-motion';
 
 const LandingPage = () => {
@@ -18,6 +21,29 @@ const LandingPage = () => {
   const toaster = useToast();
   const [accounts, setAccounts] = useState<string[]>([]);
   const { walletProvider, err: walletProviderErr } = getWalletProvider();
+
+  const globeConfig = {
+    pointSize: 8,
+    globeColor: 'rgba(76, 187, 23,0.5)',
+    showAtmosphere: true,
+    atmosphereColor: '#38bdf8',
+    atmosphereAltitude: 0.2,
+    emissive: '#38bdf8',
+    emissiveIntensity: 0.1,
+    shininess: 1,
+    polygonColor: '#ffffff',
+    ambientLight: '#38bdf8',
+    directionalLeftLight: '#ffffff',
+    directionalTopLight: '#ffffff',
+    pointLight: '#38bdf8',
+    arcTime: 1000,
+    arcLength: 0.9,
+    rings: 1,
+    maxRings: 3,
+    initialPosition: { lat: 22.3193, lng: 114.1694 },
+    autoRotate: true,
+    autoRotateSpeed: 0.5,
+  };
 
   const handleConnectWallet = async () => {
     if (walletProviderErr === `!${OFFCIAL_NETWORK_NAME}` || !walletProvider) {

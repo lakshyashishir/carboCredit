@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-
+ "use client";
 import Footer from '@/components/footer';
 import NavSideBar from '@/components/sidebar';
 

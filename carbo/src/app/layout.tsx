@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-
+import React from 'react';
 import '@/styles/globals.css';
 import StyreneAWebFont from '@/fonts';
 import dappMetadata from '@/utils/common/metadata';

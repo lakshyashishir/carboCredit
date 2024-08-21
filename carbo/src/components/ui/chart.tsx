@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
-import { createContext } from 'react';
 
 import { cn } from "@/lib/utils"
 
@@ -23,7 +22,7 @@ type ChartContextProps = {
   config: ChartConfig
 }
 
-const ChartContext = createContext<ChartContextProps | null>(null)
+const ChartContext = React.createContext<ChartContextProps | null>(null)
 
 function useChart() {
   const context = React.useContext(ChartContext)

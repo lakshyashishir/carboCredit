@@ -1,3 +1,4 @@
+'use client';
 import LandingPage from '@/sections/landing';
 
 export default function Home() {
